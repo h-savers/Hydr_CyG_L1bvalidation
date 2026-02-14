@@ -1,0 +1,94 @@
+
+close all
+clear all
+ThresholDist=5000 ; 
+ThresholdTimeDelay=12 ; 
+sizesave=5000 ; 
+H_file='E:\Work\HydroGNSS_PhCDE\HydroGNSSCalVal\HydroGNSS_Extraction\output\Hyd2_inOrbit_26-02-04_10-09.mat' ;
+C_file='E:\Work\HydroGNSS_PhCDE\HydroGNSSCalVal\CyGNSS_Extraction\outputs\MyBrench_20260127-20260130_2026-02-04_21-57-45.mat' ;
+
+load(H_file)
+H_specularPointLat=specularPointLat ;
+H_specularPointLon=specularPointLon ;
+H_reflectivityLinear_1_L=reflectivityLinear_1_L ;
+H_reflectivityLinear_1_R=reflectivityLinear_1_R ; 
+H_SNR_1_L=SNR_1_L ;
+H_SNR_1_R=SNR_1_R ;
+H_time=timeUTC ;  
+clearvars -except H_specularPointLat H_specularPointLon H_reflectivityLinear_1_L...
+    H_reflectivityLinear_1_R  H_SNR_1_L H_SNR_1_R H_time H_file C_file...
+    sizesave ThresholDist ThresholdTimeDelay
+load(C_file)
+C_specularPointLat=specularPointLat ;
+C_specularPointLon=specularPointLon ;
+C_reflectivityLinear_1_L=reflectivityLinear_L1_L ;
+% C_reflectivityLinear_1_R=reflectivityLinear_1_R ; 
+SNR_L1_L(find(SNR_L1_L==-9999))=NaN ; 
+SNR_L1_L(find(SNR_L1_L<=0))=NaN ; 
+C_SNR_1_L=10*log10(10.^(SNR_L1_L/10)-1) ;
+% C_SNR_1_R=SNR_1_R ;
+C_time=timeUTC ; 
+clearvars -except C_specularPointLat C_specularPointLon C_reflectivityLinear_1_L...
+    C_reflectivityLinear_1_R  C_SNR_1_L H_SNR_1_R H_time C_time H_specularPointLat...
+    H_specularPointLon H_reflectivityLinear_1_L H_reflectivityLinear_1_R  H_SNR_1_L...
+    H_SNR_1_R H_timeUTC H_file C_file sizesave ThresholDist ThresholdTimeDelay
+% H_time=datetime(H_timeUTC) ; 
+% C_time=datetime(C_timeUTC) ;
+H_geo=[H_specularPointLat, H_specularPointLon] ;
+C_geo=[C_specularPointLat, C_specularPointLon] ;
+Idx=knnsearch(C_geo,H_geo) ; 
+figure, geoscatter(H_geo(:,1), H_geo(:,2), '.') 
+hold on, geoscatter(C_geo(Idx,1), C_geo(Idx,2), '.r')
+C_geonear=C_geo(Idx,:) ; 
+
+arclen=[]; for i=1:length(H_specularPointLat), latlon1=H_geo(i,:) ; latlon2=C_geo(Idx(i),:) ; arclen=[arclen, Mylldistkm(latlon1', latlon2')] ; end
+
+% arclen=Mylldistkm(H_geo, C_geonear) ; 
+% pippo=sqrt((H_specularPointLat-C_specularPointLat(Idx)).^2+(H_specularPointLon-C_specularPointLon(Idx)).^2) ; 
+NearPoints = find(arclen <= ThresholDist/1000) ;
+figure,geoscatter(H_geo(NearPoints,1), H_geo(NearPoints,2), '.r')
+hold on,geoscatter(C_geo(Idx(NearPoints),1), C_geo(Idx(NearPoints),2), '.b')
+hold on,geoscatter(C_geo(Idx(NearPoints(10)),1), C_geo(Idx(NearPoints(10)),2), '*g')
+
+figure, scatter(10*log10(H_reflectivityLinear_1_L(NearPoints)),real(10*log10(C_reflectivityLinear_1_L(Idx(NearPoints)))))
+HC_timedelay=C_time(Idx(NearPoints))-H_time(NearPoints) ; 
+NearTimes=find(abs(hours(HC_timedelay))<=ThresholdTimeDelay) ; 
+HC_timedelay=C_time(Idx)-H_time ; 
+NearTimes=find(abs(hours(HC_timedelay))<=ThresholdTimeDelay) ; 
+NearSpaceTime=intersect(NearTimes, )
+
+
+
+
+SMAPPoints=length(C_specularPointLat)  ;
+numsplits=fix(SMAPPoints/sizesave) ; 
+if numsplits ==0
+    arclen=1000.*Mylldistkm([H_specularPointLat'; H_specularPointLon'], [C_specularPointLat'; C_specularPointLon']) ;  
+else
+    arclen=[] ; 
+    for isplit=1:sizesave:sizesave*numsplits    
+    arclen=[arclen, 1000*Mylldistkm([H_specularPointLat'; H_specularPointLon'], [C_specularPointLat(isplit:isplit-1+sizesave)'; C_specularPointLon(isplit:isplit-1+sizesave)']) ] ; 
+end
+    arclen=[myfile.arclen, 1000*Mylldistkm([H_specularPointLat'; H_specularPointLon'], [C_specularPointLat(isplit+sizesave:end)'; C_specularPointLon(isplit+sizesave:end)']) ] ; 
+end 
+
+% arclen=1000.*Mylldistkm2([H_specularPointLat'; H_specularPointLon'], [C_specularPointLat'; C_specularPointLon']) ;
+sizearclen=size(arclen) ; 
+[NearSpacerow, NearSpacecol] = find(arclen <= ThresholDist) ;
+Idxspace= sub2ind(sizearclen,NearSpacerow,NearSpacecol) ; 
+arclen=arclen(Idxspace) ; 
+% DelayPoints=repmat(datetime(HydroTime), 1,SMAPPoints) ; 
+% DelayPoints=hours(DelayPoints-repmat(datetime(SMAPTime)', HydroPoints,1 )) ;
+% DelayPoints=DelayPoints(Idxspace) ; 
+DelayPoints=hours(repmat(datetime(H_time(NearSpacerow)), 1,length(NearSpacerow))-repmat(datetime(C_time(NearSpacecol))', length(NearSpacerow),1 )) ;
+IdxDelay= sub2ind(size(DelayPoints),[1:1:length(NearSpacerow)]',[1:1:length(NearSpacerow)]') ;
+DelayPoints=DelayPoints(IdxDelay) ;
+
+dxtime=find(abs(DelayPoints) <= ThresholdTimeDelay) ;
+arclen=arclen(Idxtime) ; DelayPoints=DelayPoints(Idxtime) ; 
+NearSpaceTime=Idxspace(Idxtime) ; 
+D=arclen ; T= DelayPoints ; 
+[NearSpaceTimerow,NearSpaceTimecol] = ind2sub(sizearclen,NearSpaceTime)  ;
+[C, ia, ic]=unique(NearSpaceTimerow);
+
+
