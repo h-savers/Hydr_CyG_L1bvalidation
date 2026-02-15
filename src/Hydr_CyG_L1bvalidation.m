@@ -1,6 +1,7 @@
 
 close all
 clear all
+
 ThresholDist=5000 ; 
 ThresholdTimeDelay=12 ; 
 sizesave=5000 ; 
@@ -36,6 +37,18 @@ clearvars -except C_specularPointLat C_specularPointLon C_reflectivityLinear_1_L
 % C_time=datetime(C_timeUTC) ;
 H_geo=[H_specularPointLat, H_specularPointLon] ;
 C_geo=[C_specularPointLat, C_specularPointLon] ;
+H_length=length(H_time) ;
+C_length=length(C_time) ; 
+
+DelayPoints=hours(repmat(datetime(H_time), 1,H_length)-repmat(datetime(C_time)', C_length,1 )) ;
+% IdxDelay= sub2ind(size(DelayPoints),[1:1:H_length,[1:1:C_length]') ;
+% DelayPoints=DelayPoints(IdxDelay) ;
+% %
+% Idxtime=find(abs(DelayPoints) <= ThresholdTimeDelay) ;
+% 
+
+
+
 Idx=knnsearch(C_geo,H_geo) ; 
 figure, geoscatter(H_geo(:,1), H_geo(:,2), '.') 
 hold on, geoscatter(C_geo(Idx,1), C_geo(Idx,2), '.r')

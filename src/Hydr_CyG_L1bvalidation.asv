@@ -1,6 +1,7 @@
 
 close all
 clear all
+
 ThresholDist=5000 ; 
 ThresholdTimeDelay=12 ; 
 sizesave=5000 ; 
@@ -36,6 +37,26 @@ clearvars -except C_specularPointLat C_specularPointLon C_reflectivityLinear_1_L
 % C_time=datetime(C_timeUTC) ;
 H_geo=[H_specularPointLat, H_specularPointLon] ;
 C_geo=[C_specularPointLat, C_specularPointLon] ;
+H_length=length(H_time) ;
+C_length=length(C_time) ; 
+
+DelayPoints=hours(repmat(datetime(H_time), 1,length(NearSpacerow))-repmat(datetime(C_time)', length(NearSpacerow),1 )) ;
+IdxDelay= sub2ind(size(DelayPoints),[1:1:length(NearSpacerow)]',[1:1:length(NearSpacerow)]') ;
+DelayPoints=DelayPoints(IdxDelay) ;
+end
+% pippo=isnan(arclen); 
+clear SMAPLatitude SMAPLongitude
+clear HydroTime SMAPTime
+% maxpippo=max(pippo(:)) ; 
+% if max(pippo)==1,  pause(60), end 
+% % mindist(ipoint)=min(arclen) ;
+% clear pippo
+%
+Idxtime=find(abs(DelayPoints) <= ThresholdTimeDelay) ;
+
+
+
+
 Idx=knnsearch(C_geo,H_geo) ; 
 figure, geoscatter(H_geo(:,1), H_geo(:,2), '.') 
 hold on, geoscatter(C_geo(Idx,1), C_geo(Idx,2), '.r')
@@ -51,13 +72,21 @@ hold on,geoscatter(C_geo(Idx(NearPoints),1), C_geo(Idx(NearPoints),2), '.b')
 hold on,geoscatter(C_geo(Idx(NearPoints(10)),1), C_geo(Idx(NearPoints(10)),2), '*g')
 
 figure, scatter(10*log10(H_reflectivityLinear_1_L(NearPoints)),real(10*log10(C_reflectivityLinear_1_L(Idx(NearPoints)))))
-HC_timedelay=C_time(Idx(NearPoints))-H_time(NearPoints) ; 
-NearTimes=find(abs(hours(HC_timedelay))<=ThresholdTimeDelay) ; 
+% HC_timedelay=C_time(Idx(NearPoints))-H_time(NearPoints) ; 
+% NearTimes=find(abs(hours(HC_timedelay))<=ThresholdTimeDelay) ; 
 HC_timedelay=C_time(Idx)-H_time ; 
 NearTimes=find(abs(hours(HC_timedelay))<=ThresholdTimeDelay) ; 
-NearSpaceTime=intersect(NearTimes, )
-
-
+NearSpaceTime=intersect(NearTimes, NearPoints) ; 
+figure, histogram(10*log10(H_reflectivityLinear_1_L(NearSpaceTime)))
+hold on, histogram(real(10*log10(C_reflectivityLinear_1_L(Idx(NearSpaceTime)))))
+legend('HydroGNSS-2', 'CyGNSS')
+title('Colocated L1 Left reflectivity from HydroGNSS-2 and CyGNSS')
+xlabel('Reflectivity [dB]')
+figure, histogram(H_SNR_1_L(NearSpaceTime))
+hold on, histogram(C_SNR_1_L(Idx(NearSpaceTime)))
+legend('HydroGNSS-2', 'CyGNSS')
+title('Colocated L1 Left SNR from HydroGNSS-2 and CyGNSS')
+xlabel('SNR=(Pr-N)/N [dB]')
 
 
 SMAPPoints=length(C_specularPointLat)  ;
