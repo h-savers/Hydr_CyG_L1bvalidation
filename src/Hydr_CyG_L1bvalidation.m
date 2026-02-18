@@ -5,8 +5,8 @@ clear all
 ThresholDist=5000 ; 
 ThresholdTimeDelay=12 ; 
 sizesave=5000 ; 
-H_file='E:\Work\HydroGNSS_PhCDE\HydroGNSSCalVal\HydroGNSS_Extraction\output\Hyd2_inOrbit_26-02-04_10-09.mat' ;
-C_file='E:\Work\HydroGNSS_PhCDE\HydroGNSSCalVal\CyGNSS_Extraction\outputs\MyBrench_20260127-20260130_2026-02-04_21-57-45.mat' ;
+H_file='D:\home on Dell NP (gordiani)\HydroGNSS_PhCDE\HydroGNSSCalVal\HydroGNSS_Extract\output\Extract10feb_26-02-15_11-33.mat' ;
+C_file='D:\home on Dell NP (gordiani)\HydroGNSS_PhCDE\HydroGNSSCalVal\CyGNSS_Extraction\output\MyBrench_20260127-20260130_2026-02-04_21-57-45.mat' ;
 
 load(H_file)
 H_specularPointLat=specularPointLat ;
@@ -39,6 +39,27 @@ H_geo=[H_specularPointLat, H_specularPointLon] ;
 C_geo=[C_specularPointLat, C_specularPointLon] ;
 H_length=length(H_time) ;
 C_length=length(C_time) ; 
+
+[best_match, best_dist]=geotimeloc(H_time, H_geo(:,1), H_geo(:,2),...
+    C_time, C_geo(:,1), C_geo(:,2), hours(ThresholdTimeDelay), ThresholDist)
+
+good=find(best_match>0) ; best=best_match(best_match>0) ;
+figure, geoscatter((H_geo(good,1)), (H_geo(good,2)), '.')
+hold on, geoscatter((C_geo(best,1)), (C_geo(best,2)), '.r')
+
+[idx1_match, idx2_match, dist_km, delta_t] = ...
+    geotimeloc(H_geo(:,1), H_geo(:,2), H_time, C_geo(:,1), C_geo(:,2), C_time, ...
+                         ThresholDist/1000, ThresholdTimeDelay)
+
+% numOfTime=ceil(hours(max(C_time)-min(C_time))/ThresholdTimeDelay) ;
+% for ii=1:numOfTime
+%     knnsearch(hour(C_time), hour(H_time), 'Distance', '@f')
+% 
+% C_time(min(C_time)+hours(12)
+
+
+f=@timethr
+knnsearch(hour(C_time), hour(H_time), 'Distance', '@f')
 
 DelayPoints=hours(repmat(datetime(H_time), 1,H_length)-repmat(datetime(C_time)', C_length,1 )) ;
 % IdxDelay= sub2ind(size(DelayPoints),[1:1:H_length,[1:1:C_length]') ;
