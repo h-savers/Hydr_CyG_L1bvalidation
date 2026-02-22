@@ -1,13 +1,79 @@
-
+function Hydr_CyG_L1bvalidation(configurationPath)
 close all
-clear all
+clearvars -except  configurationPath
 
-ThresholDist=5000 ; 
-ThresholdTimeDelay=12 ; 
-sizesave=5000 ; 
-H_file='D:\home on Dell NP (gordiani)\HydroGNSS_PhCDE\HydroGNSSCalVal\HydroGNSS_Extract\output\Extract10feb_26-02-15_11-33.mat' ;
-C_file='D:\home on Dell NP (gordiani)\HydroGNSS_PhCDE\HydroGNSSCalVal\CyGNSS_Extraction\output\MyBrench_20260127-20260130_2026-02-04_21-57-45.mat' ;
+ex=exist('configurationPath') ;
+if ex ==0
+    mode="GUI" ;
+    
+    [configurationfile configurationPath] = uigetfile('../*.cfg', 'Select input configuration file') ; 
+    configurationPath= [ configurationPath configurationfile]  ; 
+else
+    if ~isfile(configurationPath)
+        throw(MException('INPUT:ERROR', "Cannot find configuration file. Please check the command line and try again."))
+    end
+    mode="input" ;
+end
+% 
+% 
+% 
+% H_file='D:\home on Dell NP (gordiani)\HydroGNSS_PhCDE\HydroGNSSCalVal\HydroGNSS_Extract\output\Extract10feb_26-02-15_11-33.mat' ;
+% C_file='D:\home on Dell NP (gordiani)\HydroGNSS_PhCDE\HydroGNSSCalVal\CyGNSS_Extraction\output\MyBrench_20260127-20260130_2026-02-04_21-57-45.mat' ;
 
+[H_file, C_file, ThresholdTimeDelay, ThresholDist, SNRThr, colocMode] = ReadConfFile(configurationPath);
+
+switch mode
+    case "GUI" 
+%
+% ****** get inputs from GUI
+%
+    disp('GUI mode')
+% *************  Start GUI 
+Answer{1}= char(H_file) ;  
+Answer{2}= char(C_file)  ;      
+Answer{3}= char(string(ThresholdTimeDelay)) ;
+Answer{4}= char(string(ThresholDist)) ;
+Answer{5}= char(string(SNRThr))  ;
+Answer{6}= char(colocMode) ; 
+
+% ****** get inputs from GUI
+prompt={ 'HydroGNSS extracted file : ',...
+         'CyGNSS extracted file: ',...
+         'Maximum observations time delay [hours]: ',...
+         'Maximum distance [meters]: ', ...
+         'SNR threshold for reflectivity comparison [dB]: ',...
+         'Colocation Mode [fast | accurate]: '}  ; 
+opts.Resize='on';
+opts.WindowStyle='normal';
+opts.Interpreter='tex';
+name='HydroGNSS vs CyGNSS L1B data comparison';
+numlines=[1 150; 1 150; 1 90; 1 90; 1 90; 1 90] ; 
+defaultanswer={Answer{1},Answer{2},...
+                 Answer{3},Answer{4},Answer{5},Answer{6} };
+Answer=inputdlg(prompt,name,numlines,defaultanswer,opts);
+
+H_file= Answer{1};
+C_file= Answer{2};
+ThresholdTimeDelay= str2num(Answer{3});
+ThresholDist= str2num(Answer{4});
+SNRThr=str2num(Answer{5});
+colocMode=Answer{6} ; 
+%
+% ****** Save GUI input into Input Configuration File 
+% save('../conf/Configuration.mat', 'Answer', '-append') ;
+
+WriteConfig(configurationPath, H_file, C_file, ThresholdTimeDelay, ThresholDist, SNRThr, colocMode);
+
+% switch mode
+    case "input" 
+    disp('input mode')
+
+[H_file, C_file, ThresholdTimeDelay, ThresholDist, SNRThr, colocMode] = ReadConfFile(configurationPath);
+
+end
+%
+%%%%  Initiate processing
+%
 load(H_file)
 H_specularPointLat=specularPointLat ;
 H_specularPointLon=specularPointLon ;
@@ -18,7 +84,7 @@ H_SNR_1_R=SNR_1_R ;
 H_time=timeUTC ;  
 clearvars -except H_specularPointLat H_specularPointLon H_reflectivityLinear_1_L...
     H_reflectivityLinear_1_R  H_SNR_1_L H_SNR_1_R H_time H_file C_file...
-    sizesave ThresholDist ThresholdTimeDelay
+    sizesave ThresholDist ThresholdTimeDelay SNRThr colocMode 
 load(C_file)
 C_specularPointLat=specularPointLat ;
 C_specularPointLon=specularPointLon ;
@@ -32,105 +98,101 @@ C_time=timeUTC ;
 clearvars -except C_specularPointLat C_specularPointLon C_reflectivityLinear_1_L...
     C_reflectivityLinear_1_R  C_SNR_1_L H_SNR_1_R H_time C_time H_specularPointLat...
     H_specularPointLon H_reflectivityLinear_1_L H_reflectivityLinear_1_R  H_SNR_1_L...
-    H_SNR_1_R H_timeUTC H_file C_file sizesave ThresholDist ThresholdTimeDelay
+    H_SNR_1_R H_timeUTC H_file C_file sizesave ThresholDist ThresholdTimeDelay SNRThr colocMode
 % H_time=datetime(H_timeUTC) ; 
 % C_time=datetime(C_timeUTC) ;
 H_geo=[H_specularPointLat, H_specularPointLon] ;
 C_geo=[C_specularPointLat, C_specularPointLon] ;
+clearvars H_specularPointLat H_specularPointLon C_specularPointLat C_specularPointLon
 H_length=length(H_time) ;
 C_length=length(C_time) ; 
 
-[best_match, best_dist]=geotimeloc(H_time, H_geo(:,1), H_geo(:,2),...
-    C_time, C_geo(:,1), C_geo(:,2), hours(ThresholdTimeDelay), ThresholDist)
-
-good=find(best_match>0) ; best=best_match(best_match>0) ;
-figure, geoscatter((H_geo(good,1)), (H_geo(good,2)), '.')
-hold on, geoscatter((C_geo(best,1)), (C_geo(best,2)), '.r')
-
-[idx1_match, idx2_match, dist_km, delta_t] = ...
-    geotimeloc(H_geo(:,1), H_geo(:,2), H_time, C_geo(:,1), C_geo(:,2), C_time, ...
-                         ThresholDist/1000, ThresholdTimeDelay)
-
-% numOfTime=ceil(hours(max(C_time)-min(C_time))/ThresholdTimeDelay) ;
-% for ii=1:numOfTime
-%     knnsearch(hour(C_time), hour(H_time), 'Distance', '@f')
+switch colocMode
+    case 'accurate'
+%
+[best_dist, H_good, C_best]=geotimeloc(H_time, H_geo(:,1), H_geo(:,2),...
+    C_time, C_geo(:,1), C_geo(:,2), hours(ThresholdTimeDelay), ThresholDist) ;
+%
+figure, geoscatter((H_geo(:,1)), (H_geo(:,2)), '.')
+hold on, geoscatter((C_geo(C_best,1)), (C_geo(C_best,2)), '.r')
+title('HydroGNSS and colocated CyGNSS SP locations')
+legend('HydroGNSS', 'CyGNSS')
+% test of results
+figure, histogram((H_time(H_good))-(C_time(C_best)))
+title('Time delay between selected HydroGNSS and CyGNSS reflections') 
+arclen=Mylldistkm(H_geo(H_good,:)', C_geo(C_best,:)') ;
+for i=1:length(best_dist), distance(i)=arclen(i,i); end
+figure, plot(distance, best_dist/1000, '.')
+title('Comparison between recomputed distance and geotimeloc distance')
 % 
-% C_time(min(C_time)+hours(12)
+nbins=50; 
+figure, histogram(10*log10(H_reflectivityLinear_1_L(H_good)),nbins)
+hold on, histogram(real(10*log10(C_reflectivityLinear_1_L(C_best))),nbins)
+legend('HydroGNSS', 'CyGNSS')
+title('Colocated L1 Left reflectivity from HydroGNSS and CyGNSS')
+xlabel('Reflectivity [dB]')
+%
+figure, histogram(H_SNR_1_L(H_good),nbins)
+hold on, histogram(C_SNR_1_L(C_best),nbins)
+legend('HydroGNSS', 'CyGNSS')
+title('Colocated L1 Left SNR from HydroGNSS-2 and CyGNSS')
+xlabel('SNR=(Pr-N)/N [dB]')
+%
+% SNRThr=0.5 ; 
+H_SNR_1_L_match=H_SNR_1_L(H_good) ;
+C_SNR_1_L_match=C_SNR_1_L(C_best) ;
+goodSNR=find(H_SNR_1_L_match>SNRThr & C_SNR_1_L_match> SNRThr) ;
+H_match_dB=10*log10(H_reflectivityLinear_1_L(H_good));
+C_match_dB=10*log10(C_reflectivityLinear_1_L(C_best)) ; 
+figure, scatter(real(C_match_dB), H_match_dB, '.r')
+title('Comparison of CyGNSS and HydroGNSS colocated reflectivity')
+xlabel('CyGNSS reflectivity [dB]') ; ylabel('HydroGNSS reflectivity [dB]') ; 
+xlim([-45 15]); ylim([-45 15]); 
+hold on, scatter(real(C_match_dB(goodSNR)), H_match_dB(goodSNR), 'ob', 'filled')
+legend('All colocations' , ['SNR>' char(string(SNRThr))])
 
-
-f=@timethr
-knnsearch(hour(C_time), hour(H_time), 'Distance', '@f')
-
-DelayPoints=hours(repmat(datetime(H_time), 1,H_length)-repmat(datetime(C_time)', C_length,1 )) ;
-% IdxDelay= sub2ind(size(DelayPoints),[1:1:H_length,[1:1:C_length]') ;
-% DelayPoints=DelayPoints(IdxDelay) ;
-% %
-% Idxtime=find(abs(DelayPoints) <= ThresholdTimeDelay) ;
-% 
-
-
+    case 'fast'
 
 Idx=knnsearch(C_geo,H_geo) ; 
 figure, geoscatter(H_geo(:,1), H_geo(:,2), '.') 
 hold on, geoscatter(C_geo(Idx,1), C_geo(Idx,2), '.r')
 C_geonear=C_geo(Idx,:) ; 
-
-arclen=[]; for i=1:length(H_specularPointLat), latlon1=H_geo(i,:) ; latlon2=C_geo(Idx(i),:) ; arclen=[arclen, Mylldistkm(latlon1', latlon2')] ; end
-
-% arclen=Mylldistkm(H_geo, C_geonear) ; 
-% pippo=sqrt((H_specularPointLat-C_specularPointLat(Idx)).^2+(H_specularPointLon-C_specularPointLon(Idx)).^2) ; 
+arclen=[]; for i=1:H_length, latlon1=H_geo(i,:) ; latlon2=C_geo(Idx(i),:) ; arclen=[arclen, Mylldistkm(latlon1', latlon2')] ; end
 NearPoints = find(arclen <= ThresholDist/1000) ;
 figure,geoscatter(H_geo(NearPoints,1), H_geo(NearPoints,2), '.r')
 hold on,geoscatter(C_geo(Idx(NearPoints),1), C_geo(Idx(NearPoints),2), '.b')
 hold on,geoscatter(C_geo(Idx(NearPoints(10)),1), C_geo(Idx(NearPoints(10)),2), '*g')
-
-figure, scatter(10*log10(H_reflectivityLinear_1_L(NearPoints)),real(10*log10(C_reflectivityLinear_1_L(Idx(NearPoints)))))
+% figure, scatter(10*log10(H_reflectivityLinear_1_L(NearPoints)),real(10*log10(C_reflectivityLinear_1_L(Idx(NearPoints)))), '.')
 % HC_timedelay=C_time(Idx(NearPoints))-H_time(NearPoints) ; 
 % NearTimes=find(abs(hours(HC_timedelay))<=ThresholdTimeDelay) ; 
 HC_timedelay=C_time(Idx)-H_time ; 
 NearTimes=find(abs(hours(HC_timedelay))<=ThresholdTimeDelay) ; 
 NearSpaceTime=intersect(NearTimes, NearPoints) ; 
-figure, histogram(10*log10(H_reflectivityLinear_1_L(NearSpaceTime)))
-hold on, histogram(real(10*log10(C_reflectivityLinear_1_L(Idx(NearSpaceTime)))))
+
+figure, scatter(10*log10(H_reflectivityLinear_1_L(NearSpaceTime)),real(10*log10(C_reflectivityLinear_1_L(Idx(NearSpaceTime)))), '.')
+xlim([-50 20]); ylim([-50 20]); 
+
+nbins=50; 
+figure, histogram(10*log10(H_reflectivityLinear_1_L(NearSpaceTime)),nbins)
+hold on, histogram(real(10*log10(C_reflectivityLinear_1_L(Idx(NearSpaceTime)))),nbins)
 legend('HydroGNSS-2', 'CyGNSS')
 title('Colocated L1 Left reflectivity from HydroGNSS-2 and CyGNSS')
 xlabel('Reflectivity [dB]')
-figure, histogram(H_SNR_1_L(NearSpaceTime))
-hold on, histogram(C_SNR_1_L(Idx(NearSpaceTime)))
+figure, histogram(H_SNR_1_L(NearSpaceTime),nbins)
+hold on, histogram(C_SNR_1_L(Idx(NearSpaceTime)),nbins)
 legend('HydroGNSS-2', 'CyGNSS')
 title('Colocated L1 Left SNR from HydroGNSS-2 and CyGNSS')
 xlabel('SNR=(Pr-N)/N [dB]')
 
+goodSNR=find(H_SNR_1_L>SNRThr & C_SNR_1_L(Idx)>SNRThr); 
+figure, scatter(real(10*log10(C_reflectivityLinear_1_L(Idx(NearSpaceTime)))), 10*log10(H_reflectivityLinear_1_L(NearSpaceTime)), '.r')
+hold on, scatter(real(10*log10(C_reflectivityLinear_1_L(Idx(intersect(goodSNR, NearSpaceTime))))), 10*log10(H_reflectivityLinear_1_L(intersect(goodSNR, NearSpaceTime))), 'ob', 'filled')
+ylabel('HydroGNSS Reflectivity L1 Left [dB]')
+xlabel('CyGNSS Reflectivity L1 Left [dB]')
+title(['Comparison HydroGNSS vs CyGNSS Reflectivity [dB]. SNR>' char(string(SNRThr)) 'dB'])
+xlim([-45 15]); ylim([-45 15]); 
+legend('All colocations' , ['SNR>' char(string(SNRThr))])
 
-SMAPPoints=length(C_specularPointLat)  ;
-numsplits=fix(SMAPPoints/sizesave) ; 
-if numsplits ==0
-    arclen=1000.*Mylldistkm([H_specularPointLat'; H_specularPointLon'], [C_specularPointLat'; C_specularPointLon']) ;  
-else
-    arclen=[] ; 
-    for isplit=1:sizesave:sizesave*numsplits    
-    arclen=[arclen, 1000*Mylldistkm([H_specularPointLat'; H_specularPointLon'], [C_specularPointLat(isplit:isplit-1+sizesave)'; C_specularPointLon(isplit:isplit-1+sizesave)']) ] ; 
 end
-    arclen=[myfile.arclen, 1000*Mylldistkm([H_specularPointLat'; H_specularPointLon'], [C_specularPointLat(isplit+sizesave:end)'; C_specularPointLon(isplit+sizesave:end)']) ] ; 
-end 
 
-% arclen=1000.*Mylldistkm2([H_specularPointLat'; H_specularPointLon'], [C_specularPointLat'; C_specularPointLon']) ;
-sizearclen=size(arclen) ; 
-[NearSpacerow, NearSpacecol] = find(arclen <= ThresholDist) ;
-Idxspace= sub2ind(sizearclen,NearSpacerow,NearSpacecol) ; 
-arclen=arclen(Idxspace) ; 
-% DelayPoints=repmat(datetime(HydroTime), 1,SMAPPoints) ; 
-% DelayPoints=hours(DelayPoints-repmat(datetime(SMAPTime)', HydroPoints,1 )) ;
-% DelayPoints=DelayPoints(Idxspace) ; 
-DelayPoints=hours(repmat(datetime(H_time(NearSpacerow)), 1,length(NearSpacerow))-repmat(datetime(C_time(NearSpacecol))', length(NearSpacerow),1 )) ;
-IdxDelay= sub2ind(size(DelayPoints),[1:1:length(NearSpacerow)]',[1:1:length(NearSpacerow)]') ;
-DelayPoints=DelayPoints(IdxDelay) ;
-
-dxtime=find(abs(DelayPoints) <= ThresholdTimeDelay) ;
-arclen=arclen(Idxtime) ; DelayPoints=DelayPoints(Idxtime) ; 
-NearSpaceTime=Idxspace(Idxtime) ; 
-D=arclen ; T= DelayPoints ; 
-[NearSpaceTimerow,NearSpaceTimecol] = ind2sub(sizearclen,NearSpaceTime)  ;
-[C, ia, ic]=unique(NearSpaceTimerow);
-
-
+end
