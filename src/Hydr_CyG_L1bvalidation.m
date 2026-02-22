@@ -135,7 +135,7 @@ xlabel('Reflectivity [dB]')
 figure, histogram(H_SNR_1_L(H_good),nbins)
 hold on, histogram(C_SNR_1_L(C_best),nbins)
 legend('HydroGNSS', 'CyGNSS')
-title('Colocated L1 Left SNR from HydroGNSS-2 and CyGNSS')
+title('Colocated L1 Left SNR from HydroGNSS and CyGNSS')
 xlabel('SNR=(Pr-N)/N [dB]')
 %
 % SNRThr=0.5 ; 
@@ -169,19 +169,16 @@ HC_timedelay=C_time(Idx)-H_time ;
 NearTimes=find(abs(hours(HC_timedelay))<=ThresholdTimeDelay) ; 
 NearSpaceTime=intersect(NearTimes, NearPoints) ; 
 
-figure, scatter(10*log10(H_reflectivityLinear_1_L(NearSpaceTime)),real(10*log10(C_reflectivityLinear_1_L(Idx(NearSpaceTime)))), '.')
-xlim([-50 20]); ylim([-50 20]); 
-
 nbins=50; 
 figure, histogram(10*log10(H_reflectivityLinear_1_L(NearSpaceTime)),nbins)
 hold on, histogram(real(10*log10(C_reflectivityLinear_1_L(Idx(NearSpaceTime)))),nbins)
-legend('HydroGNSS-2', 'CyGNSS')
-title('Colocated L1 Left reflectivity from HydroGNSS-2 and CyGNSS')
+legend('HydroGNSS', 'CyGNSS')
+title('Colocated L1 Left reflectivity from HydroGNSS and CyGNSS')
 xlabel('Reflectivity [dB]')
 figure, histogram(H_SNR_1_L(NearSpaceTime),nbins)
 hold on, histogram(C_SNR_1_L(Idx(NearSpaceTime)),nbins)
-legend('HydroGNSS-2', 'CyGNSS')
-title('Colocated L1 Left SNR from HydroGNSS-2 and CyGNSS')
+legend('HydroGNSS', 'CyGNSS')
+title('Colocated L1 Left SNR from HydroGNSS and CyGNSS')
 xlabel('SNR=(Pr-N)/N [dB]')
 
 goodSNR=find(H_SNR_1_L>SNRThr & C_SNR_1_L(Idx)>SNRThr); 

@@ -24,7 +24,7 @@ function [H_file, C_file, ThresholdTimeDelay, ThresholDist, SNRThr, colocMode] =
             startIndex= regexp(lines(ConfigRightLine),'=') ; 
             ThresholDist= extractAfter(lines(ConfigRightLine),startIndex) ; % max distance between SP and SMAP grid cell in meters
             ThresholDist=double(ThresholDist) ; 
-            %%                  
+%%                  
             ConfigRightLine= contains(lines,'SNRThr')  ;  
             ConfigRightLine= find(ConfigRightLine==1)  ;   
             startIndex= regexp(lines(ConfigRightLine),'=') ; 
