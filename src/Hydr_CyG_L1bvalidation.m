@@ -82,9 +82,10 @@ H_reflectivityLinear_1_R=reflectivityLinear_1_R ;
 H_SNR_1_L=SNR_1_L ;
 H_SNR_1_R=SNR_1_R ;
 H_time=timeUTC ;  
+H_constellation=constellation ; 
 clearvars -except H_specularPointLat H_specularPointLon H_reflectivityLinear_1_L...
     H_reflectivityLinear_1_R  H_SNR_1_L H_SNR_1_R H_time H_file C_file...
-    sizesave ThresholDist ThresholdTimeDelay SNRThr colocMode 
+    sizesave ThresholDist ThresholdTimeDelay SNRThr colocMode H_constellation
 load(C_file)
 C_specularPointLat=specularPointLat ;
 C_specularPointLon=specularPointLon ;
@@ -98,7 +99,8 @@ C_time=timeUTC ;
 clearvars -except C_specularPointLat C_specularPointLon C_reflectivityLinear_1_L...
     C_reflectivityLinear_1_R  C_SNR_1_L H_SNR_1_R H_time C_time H_specularPointLat...
     H_specularPointLon H_reflectivityLinear_1_L H_reflectivityLinear_1_R  H_SNR_1_L...
-    H_SNR_1_R H_timeUTC H_file C_file sizesave ThresholDist ThresholdTimeDelay SNRThr colocMode
+    H_SNR_1_R H_timeUTC H_file C_file sizesave ThresholDist ThresholdTimeDelay...
+    SNRThr H_constellation colocMode
 % H_time=datetime(H_timeUTC) ; 
 % C_time=datetime(C_timeUTC) ;
 H_geo=[H_specularPointLat, H_specularPointLon] ;
@@ -106,6 +108,34 @@ C_geo=[C_specularPointLat, C_specularPointLon] ;
 clearvars H_specularPointLat H_specularPointLon C_specularPointLat C_specularPointLon
 H_length=length(H_time) ;
 C_length=length(C_time) ; 
+
+load coastlines ;
+in = inpolygon(H_geo(:,2), H_geo(:,1), coastlon, coastlat);
+figure, geoscatter(H_geo(in,1),H_geo(in,2), 2, 10*log10(H_reflectivityLinear_1_L(in)), 'filled')
+c=colorbar ; 
+caxis([-35, 0])
+title('HydroGNSS unfiltered Reflectivity L1/E1 Left [dB]')
+
+figure, histogram(10*log10(H_reflectivityLinear_1_L(in)))
+hold on, histogram(10*log10(H_reflectivityLinear_1_R(in)))
+xlim([-45,100])
+legend('Left', 'Right')
+title('Over land unfiltered HydroGNSS reflectivity L1/E1')
+xlabel('Reflectivity [dB]')
+
+figure, histogram(10*log10(H_reflectivityLinear_1_L(intersect(find(in==1), find(H_constellation=='GPS')))))
+hold on, histogram(10*log10(H_reflectivityLinear_1_R(intersect(find(in==1), find(H_constellation=='Galileo')))))
+xlim([-45,15])
+legend('L1 Left', 'E1 Left')
+title('Over land L1 and E1 Left reflectivity comparison')
+xlabel('Reflectivity [dB]')
+
+figure, histogram(H_SNR_1_L(in))
+hold on, histogram(H_SNR_1_R(in))
+xlim([-15,25])
+legend('Left', 'Right')
+title('Over land unfiltered HydroGNSS SNR L1/E1')
+xlabel('SNR [dB]')
 
 switch colocMode
     case 'accurate'
