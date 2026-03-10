@@ -73,6 +73,8 @@ WriteConfig(configurationPath, H_file, C_file, ThresholdTimeDelay, ThresholDist,
 end
 %
 %%%%  Initiate processing
+startIndex=regexp(configurationPath, '\configuration')
+load([extractBefore(configurationPath, startIndex) 'periodHydr2.mat']) ; 
 %
 load(H_file)
 H_specularPointLat=specularPointLat ;
@@ -545,5 +547,314 @@ P12=-3+ 10.*log10(mean(reflectivityLinear_5_R(constellation=='Galileo' & SNR_5_R
 str11 = {['GPS linear mean: ' char(string(round(P11,1))) 'dB (SNR>0.5)' ],...
     ['Galileo linear mean: ' char(string(round(P12,1))) 'dB (SNR>0.5)']} ; 
 text(-20,15000,str11,'FontSize',8)
+a=1
+
+figure, histogram(incidenceAngleDeg(pitch40), 20) ;
+hold on, histogram(incidenceAngleDeg(pitch00), 20)
+hold on, histogram(incidenceAngleDeg(pitch20), 20)
+title('histogram of incidence angle with different pitch angle') 
+legend('pitch -40 deg', 'pitch 0 deg', 'pitch -20 deg')
+xlabel('Incidence angle [deg]')
+
+figure, histogram(rxAntennaGain_1_L(pitch40))
+xlim([-4 14])
+hold on, histogram(rxAntennaGain_1_L(pitch00))
+hold on, histogram(rxAntennaGain_1_L(pitch20))
+title('Antenna gain L1/E1 Left with different pitch angle')
+xlabel('RX antenna gain L1/E1 [dB]')
+legend('pitch -40 deg', 'pitch 0 deg', 'pitch -20 deg')
+
+figure, histogram(rxAntennaGain_5_L(pitch40))
+xlim([-4 14])
+hold on, histogram(rxAntennaGain_5_L(pitch00))
+hold on, histogram(rxAntennaGain_5_L(pitch20))
+title('Antenna gain L5/E5 Left with different pitch angle')
+xlabel('RX antenna gain L5/E5 [dB]')
+legend('pitch -40 deg', 'pitch 0 deg', 'pitch -20 deg')
+
+figure, histogram(SNR_1_L(pitch40),50)
+xlim([-10 20])
+hold on, histogram(SNR_1_L(pitch00),50)
+hold on, histogram(SNR_1_L(pitch20),50)
+title('SNR L1/E1 Left with different pitch angle')
+xlabel('SNR L1/E1 [dB]')
+legend('pitch -40 deg', 'pitch 0 deg', 'pitch -20 deg')
+
+figure, histogram(SNR_5_L(pitch40),50, 'Normalization', 'pdf')
+xlim([-10 20])
+hold on, histogram(SNR_5_L(pitch00),50)
+hold on, histogram(SNR_5_L(pitch20),50)
+title('SNR L5/E5 Left with different pitch angle')
+xlabel('SNR L5/E5 [dB]')
+legend('pitch -40 deg', 'pitch 0 deg', 'pitch -20 deg')
+
+
+SNR_GT05(1,1)=round(100*length(100*intersect(pitch20, find(constellation=='GPS' & SNR_1_L >=0.5)))/length(intersect(pitch20, find(constellation=='GPS'))),1) ;
+SNR_GT05(1,3)=round(100*length(100*intersect(pitch00, find(constellation=='GPS' & SNR_1_L >=0.5)))/length(intersect(pitch00, find(constellation=='GPS'))),1) ;
+SNR_GT05(1,4)=round(100*length(100*intersect(pitch40, find(constellation=='GPS' & SNR_1_L >=0.5)))/length(intersect(pitch40, find(constellation=='GPS'))),1) ;
+SNR_GT05(1,2)=round(100*length(100*intersect(tc1msec, find(constellation=='GPS' & SNR_1_L >=0.5)))/length(intersect(tc1msec, find(constellation=='GPS'))),1) ;
+SNR_GT05(1,5)=round(100*length(100*intersect(linesp, find(constellation=='GPS' & SNR_1_L >=0.5)))/length(intersect(linesp, find(constellation=='GPS'))),1) ;
+SNR_GT05(1,6)=round(100*length(100*intersect(fixgain, find(constellation=='GPS' & SNR_1_L >=0.5)))/length(intersect(fixgain, find(constellation=='GPS'))),1) ;
+SNR_GT05(1,7)=round(100*length(100*intersect(offsets, find(constellation=='GPS' & SNR_1_L >=0.5)))/length(intersect(offsets, find(constellation=='GPS'))),1) ;
+
+SNR_GT05(2,1)=round(100*length(100*intersect(pitch20, find(constellation=='GPS' & SNR_1_R >=0.5)))/length(intersect(pitch20, find(constellation=='GPS'))),1) ;
+SNR_GT05(2,3)=round(100*length(100*intersect(pitch00, find(constellation=='GPS' & SNR_1_R >=0.5)))/length(intersect(pitch00, find(constellation=='GPS'))),1) ;
+SNR_GT05(2,4)=round(100*length(100*intersect(pitch40, find(constellation=='GPS' & SNR_1_R >=0.5)))/length(intersect(pitch40, find(constellation=='GPS'))),1) ;
+SNR_GT05(2,2)=round(100*length(100*intersect(tc1msec, find(constellation=='GPS' & SNR_1_R >=0.5)))/length(intersect(tc1msec, find(constellation=='GPS'))),1) ;
+SNR_GT05(2,5)=round(100*length(100*intersect(linesp, find(constellation=='GPS' & SNR_1_R>=0.5)))/length(intersect(linesp, find(constellation=='GPS'))),1) ;
+SNR_GT05(2,6)=round(100*length(100*intersect(fixgain, find(constellation=='GPS' & SNR_1_R >=0.5)))/length(intersect(fixgain, find(constellation=='GPS'))),1) ;
+SNR_GT05(2,7)=round(100*length(100*intersect(offsets, find(constellation=='GPS' & SNR_1_R >=0.5)))/length(intersect(offsets, find(constellation=='GPS'))),1) ;
+
+SNR_GT05(3,1)=round(100*length(100*intersect(pitch20, find(constellation=='Galileo' & SNR_1_L >=0.5)))/length(intersect(pitch20, find(constellation=='Galileo'))),1) ;
+SNR_GT05(3,3)=round(100*length(100*intersect(pitch00, find(constellation=='Galileo' & SNR_1_L >=0.5)))/length(intersect(pitch00, find(constellation=='Galileo'))),1) ;
+SNR_GT05(3,4)=round(100*length(100*intersect(pitch40, find(constellation=='Galileo' & SNR_1_L >=0.5)))/length(intersect(pitch40, find(constellation=='Galileo'))),1) ;
+SNR_GT05(3,2)=round(100*length(100*intersect(tc1msec, find(constellation=='Galileo' & SNR_1_L >=0.5)))/length(intersect(tc1msec, find(constellation=='Galileo'))),1) ;
+SNR_GT05(3,5)=round(100*length(100*intersect(linesp, find(constellation=='Galileo' & SNR_1_L >=0.5)))/length(intersect(linesp, find(constellation=='Galileo'))),1) ;
+SNR_GT05(3,6)=round(100*length(100*intersect(fixgain, find(constellation=='Galileo' & SNR_1_L >=0.5)))/length(intersect(fixgain, find(constellation=='Galileo'))),1) ;
+SNR_GT05(3,7)=round(100*length(100*intersect(offsets, find(constellation=='Galileo' & SNR_1_L >=0.5)))/length(intersect(offsets, find(constellation=='Galileo'))),1) ;
+
+SNR_GT05(4,1)=round(100*length(100*intersect(pitch20, find(constellation=='Galileo' & SNR_1_R >=0.5)))/length(intersect(pitch20, find(constellation=='Galileo'))),1) ;
+SNR_GT05(4,3)=round(100*length(100*intersect(pitch00, find(constellation=='Galileo' & SNR_1_R >=0.5)))/length(intersect(pitch00, find(constellation=='Galileo'))),1) ;
+SNR_GT05(4,4)=round(100*length(100*intersect(pitch40, find(constellation=='Galileo' & SNR_1_R >=0.5)))/length(intersect(pitch40, find(constellation=='Galileo'))),1) ;
+SNR_GT05(4,2)=round(100*length(100*intersect(tc1msec, find(constellation=='Galileo' & SNR_1_R >=0.5)))/length(intersect(tc1msec, find(constellation=='Galileo'))),1) ;
+SNR_GT05(4,5)=round(100*length(100*intersect(linesp, find(constellation=='Galileo' & SNR_1_R >=0.5)))/length(intersect(linesp, find(constellation=='Galileo'))),1) ;
+SNR_GT05(4,6)=round(100*length(100*intersect(fixgain, find(constellation=='Galileo' & SNR_1_R >=0.5)))/length(intersect(fixgain, find(constellation=='Galileo'))),1) ;
+SNR_GT05(4,7)=round(100*length(100*intersect(offsets, find(constellation=='Galileo' & SNR_1_R >=0.5)))/length(intersect(offsets, find(constellation=='Galileo'))),1) ;
+%%
+SNR_GT05(5,1)=round(100*length(100*intersect(pitch20, find(constellation=='GPS' & SNR_5_L >=0.5)))/length(intersect(pitch20, find(constellation=='GPS'))),1) ;
+SNR_GT05(5,3)=round(100*length(100*intersect(pitch00, find(constellation=='GPS' & SNR_5_L >=0.5)))/length(intersect(pitch00, find(constellation=='GPS'))),1) ;
+SNR_GT05(5,4)=round(100*length(100*intersect(pitch40, find(constellation=='GPS' & SNR_5_L >=0.5)))/length(intersect(pitch40, find(constellation=='GPS'))),1) ;
+SNR_GT05(5,2)=round(100*length(100*intersect(tc1msec, find(constellation=='GPS' & SNR_5_L >=0.5)))/length(intersect(tc1msec, find(constellation=='GPS'))),1) ;
+SNR_GT05(5,5)=round(100*length(100*intersect(linesp, find(constellation=='GPS' & SNR_5_L >=0.5)))/length(intersect(linesp, find(constellation=='GPS'))),1) ;
+SNR_GT05(5,6)=round(100*length(100*intersect(fixgain, find(constellation=='GPS' & SNR_5_L >=0.5)))/length(intersect(fixgain, find(constellation=='GPS'))),1) ;
+SNR_GT05(5,7)=round(100*length(100*intersect(offsets, find(constellation=='GPS' & SNR_5_L >=0.5)))/length(intersect(offsets, find(constellation=='GPS'))),1) ;
+
+SNR_GT05(6,1)=round(100*length(100*intersect(pitch20, find(constellation=='GPS' & SNR_5_R >=0.5)))/length(intersect(pitch20, find(constellation=='GPS'))),1) ;
+SNR_GT05(6,3)=round(100*length(100*intersect(pitch00, find(constellation=='GPS' & SNR_5_R >=0.5)))/length(intersect(pitch00, find(constellation=='GPS'))),1) ;
+SNR_GT05(6,4)=round(100*length(100*intersect(pitch40, find(constellation=='GPS' & SNR_5_R >=0.5)))/length(intersect(pitch40, find(constellation=='GPS'))),1) ;
+SNR_GT05(6,2)=round(100*length(100*intersect(tc1msec, find(constellation=='GPS' & SNR_5_R >=0.5)))/length(intersect(tc1msec, find(constellation=='GPS'))),1) ;
+SNR_GT05(6,5)=round(100*length(100*intersect(linesp, find(constellation=='GPS' & SNR_5_R>=0.5)))/length(intersect(linesp, find(constellation=='GPS'))),1) ;
+SNR_GT05(6,6)=round(100*length(100*intersect(fixgain, find(constellation=='GPS' & SNR_5_R >=0.5)))/length(intersect(fixgain, find(constellation=='GPS'))),1) ;
+SNR_GT05(6,7)=round(100*length(100*intersect(offsets, find(constellation=='GPS' & SNR_5_R >=0.5)))/length(intersect(offsets, find(constellation=='GPS'))),1) ;
+
+SNR_GT05(7,1)=round(100*length(100*intersect(pitch20, find(constellation=='Galileo' & SNR_5_L >=0.5)))/length(intersect(pitch20, find(constellation=='Galileo'))),1) ;
+SNR_GT05(7,3)=round(100*length(100*intersect(pitch00, find(constellation=='Galileo' & SNR_5_L >=0.5)))/length(intersect(pitch00, find(constellation=='Galileo'))),1) ;
+SNR_GT05(7,4)=round(100*length(100*intersect(pitch40, find(constellation=='Galileo' & SNR_5_L >=0.5)))/length(intersect(pitch40, find(constellation=='Galileo'))),1) ;
+SNR_GT05(7,2)=round(100*length(100*intersect(tc1msec, find(constellation=='Galileo' & SNR_5_L >=0.5)))/length(intersect(tc1msec, find(constellation=='Galileo'))),1) ;
+SNR_GT05(7,5)=round(100*length(100*intersect(linesp, find(constellation=='Galileo' & SNR_5_L >=0.5)))/length(intersect(linesp, find(constellation=='Galileo'))),1) ;
+SNR_GT05(7,6)=round(100*length(100*intersect(fixgain, find(constellation=='Galileo' & SNR_5_L >=0.5)))/length(intersect(fixgain, find(constellation=='Galileo'))),1) ;
+SNR_GT05(7,7)=round(100*length(100*intersect(offsets, find(constellation=='Galileo' & SNR_5_L >=0.5)))/length(intersect(offsets, find(constellation=='Galileo'))),1) ;
+
+SNR_GT05(8,1)=round(100*length(100*intersect(pitch20, find(constellation=='Galileo' & SNR_5_R >=0.5)))/length(intersect(pitch20, find(constellation=='Galileo'))),1) ;
+SNR_GT05(8,3)=round(100*length(100*intersect(pitch00, find(constellation=='Galileo' & SNR_5_R >=0.5)))/length(intersect(pitch00, find(constellation=='Galileo'))),1) ;
+SNR_GT05(8,4)=round(100*length(100*intersect(pitch40, find(constellation=='Galileo' & SNR_5_R >=0.5)))/length(intersect(pitch40, find(constellation=='Galileo'))),1) ;
+SNR_GT05(8,2)=round(100*length(100*intersect(tc1msec, find(constellation=='Galileo' & SNR_5_R >=0.5)))/length(intersect(tc1msec, find(constellation=='Galileo'))),1) ;
+SNR_GT05(8,5)=round(100*length(100*intersect(linesp, find(constellation=='Galileo' & SNR_5_R >=0.5)))/length(intersect(linesp, find(constellation=='Galileo'))),1) ;
+SNR_GT05(8,6)=round(100*length(100*intersect(fixgain, find(constellation=='Galileo' & SNR_5_R >=0.5)))/length(intersect(fixgain, find(constellation=='Galileo'))),1) ;
+SNR_GT05(8,7)=round(100*length(100*intersect(offsets, find(constellation=='Galileo' & SNR_5_R >=0.5)))/length(intersect(offsets, find(constellation=='Galileo'))),1) ;
+
+Channel={'L1 Left';'L1 Right';'E1 Left';'E1 Right';'L5 Left';'L5 Right';'E5 Left';'E5 Right'; 'Meand across channels'};
+tutti=round(mean(SNR_GT05, 1),1) ;
+Mode_Nominal=SNR_GT05(:,1) ; Mode_Nominal=[Mode_Nominal; tutti(1)] ; 
+Mode_ONEmsec=SNR_GT05(:,2) ; Mode_ONEmsec=[Mode_ONEmsec; tutti(2)] ;
+Mode_Pitch0=SNR_GT05(:,3) ; Mode_Pitch0=[Mode_Pitch0; tutti(3)] ;
+Mode_Pitch40=SNR_GT05(:,4) ; Mode_Pitch40=[Mode_Pitch40; tutti(4)] ;
+Mode_linespac=SNR_GT05(:,5) ; Mode_linespac=[Mode_linespac; tutti(5)] ;
+Mode_fixgain=SNR_GT05(:,6) ; Mode_fixgain=[Mode_fixgain; tutti(6)] ;
+Mode_offsets=SNR_GT05(:,7) ; Mode_offsets=[Mode_offsets; tutti(7)] ;
+TSNR = table(Channel,Mode_Nominal,Mode_ONEmsec,Mode_Pitch0,Mode_Pitch40,Mode_linespac,Mode_fixgain,Mode_offsets )
+%%%  rxAntennaGain
+
+rxGain_GT05(1,1)=round(100*length(100*intersect(pitch20, find(constellation=='GPS' & rxAntennaGain_1_L >=0.5)))/length(intersect(pitch20, find(constellation=='GPS'))),1) ;
+rxGain_GT05(1,3)=round(100*length(100*intersect(pitch00, find(constellation=='GPS' & rxAntennaGain_1_L >=0.5)))/length(intersect(pitch00, find(constellation=='GPS'))),1) ;
+rxGain_GT05(1,4)=round(100*length(100*intersect(pitch40, find(constellation=='GPS' & rxAntennaGain_1_L >=0.5)))/length(intersect(pitch40, find(constellation=='GPS'))),1) ;
+rxGain_GT05(1,2)=round(100*length(100*intersect(tc1msec, find(constellation=='GPS' & rxAntennaGain_1_L >=0.5)))/length(intersect(tc1msec, find(constellation=='GPS'))),1) ;
+rxGain_GT05(1,5)=round(100*length(100*intersect(linesp, find(constellation=='GPS' & rxAntennaGain_1_L >=0.5)))/length(intersect(linesp, find(constellation=='GPS'))),1) ;
+rxGain_GT05(1,6)=round(100*length(100*intersect(fixgain, find(constellation=='GPS' & rxAntennaGain_1_L >=0.5)))/length(intersect(fixgain, find(constellation=='GPS'))),1) ;
+rxGain_GT05(1,7)=round(100*length(100*intersect(offsets, find(constellation=='GPS' & rxAntennaGain_1_L >=0.5)))/length(intersect(offsets, find(constellation=='GPS'))),1) ;
+
+rxGain_GT05(2,1)=round(100*length(100*intersect(pitch20, find(constellation=='GPS' & rxAntennaGain_1_R >=0.5)))/length(intersect(pitch20, find(constellation=='GPS'))),1) ;
+rxGain_GT05(2,3)=round(100*length(100*intersect(pitch00, find(constellation=='GPS' & rxAntennaGain_1_R >=0.5)))/length(intersect(pitch00, find(constellation=='GPS'))),1) ;
+rxGain_GT05(2,4)=round(100*length(100*intersect(pitch40, find(constellation=='GPS' & rxAntennaGain_1_R >=0.5)))/length(intersect(pitch40, find(constellation=='GPS'))),1) ;
+rxGain_GT05(2,2)=round(100*length(100*intersect(tc1msec, find(constellation=='GPS' & rxAntennaGain_1_R >=0.5)))/length(intersect(tc1msec, find(constellation=='GPS'))),1) ;
+rxGain_GT05(2,5)=round(100*length(100*intersect(linesp, find(constellation=='GPS' & rxAntennaGain_1_R>=0.5)))/length(intersect(linesp, find(constellation=='GPS'))),1) ;
+rxGain_GT05(2,6)=round(100*length(100*intersect(fixgain, find(constellation=='GPS' & rxAntennaGain_1_R >=0.5)))/length(intersect(fixgain, find(constellation=='GPS'))),1) ;
+rxGain_GT05(2,7)=round(100*length(100*intersect(offsets, find(constellation=='GPS' & rxAntennaGain_1_R >=0.5)))/length(intersect(offsets, find(constellation=='GPS'))),1) ;
+
+rxGain_GT05(3,1)=round(100*length(100*intersect(pitch20, find(constellation=='Galileo' & rxAntennaGain_1_L >=0.5)))/length(intersect(pitch20, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(3,3)=round(100*length(100*intersect(pitch00, find(constellation=='Galileo' & rxAntennaGain_1_L >=0.5)))/length(intersect(pitch00, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(3,4)=round(100*length(100*intersect(pitch40, find(constellation=='Galileo' & rxAntennaGain_1_L >=0.5)))/length(intersect(pitch40, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(3,2)=round(100*length(100*intersect(tc1msec, find(constellation=='Galileo' & rxAntennaGain_1_L >=0.5)))/length(intersect(tc1msec, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(3,5)=round(100*length(100*intersect(linesp, find(constellation=='Galileo' & rxAntennaGain_1_L >=0.5)))/length(intersect(linesp, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(3,6)=round(100*length(100*intersect(fixgain, find(constellation=='Galileo' & rxAntennaGain_1_L >=0.5)))/length(intersect(fixgain, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(3,7)=round(100*length(100*intersect(offsets, find(constellation=='Galileo' & rxAntennaGain_1_L >=0.5)))/length(intersect(offsets, find(constellation=='Galileo'))),1) ;
+
+rxGain_GT05(4,1)=round(100*length(100*intersect(pitch20, find(constellation=='Galileo' & rxAntennaGain_1_R >=0.5)))/length(intersect(pitch20, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(4,3)=round(100*length(100*intersect(pitch00, find(constellation=='Galileo' & rxAntennaGain_1_R >=0.5)))/length(intersect(pitch00, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(4,4)=round(100*length(100*intersect(pitch40, find(constellation=='Galileo' & rxAntennaGain_1_R >=0.5)))/length(intersect(pitch40, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(4,2)=round(100*length(100*intersect(tc1msec, find(constellation=='Galileo' & rxAntennaGain_1_R >=0.5)))/length(intersect(tc1msec, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(4,5)=round(100*length(100*intersect(linesp, find(constellation=='Galileo' & rxAntennaGain_1_R >=0.5)))/length(intersect(linesp, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(4,6)=round(100*length(100*intersect(fixgain, find(constellation=='Galileo' & rxAntennaGain_1_R >=0.5)))/length(intersect(fixgain, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(4,7)=round(100*length(100*intersect(offsets, find(constellation=='Galileo' & rxAntennaGain_1_R >=0.5)))/length(intersect(offsets, find(constellation=='Galileo'))),1) ;
+%%
+rxGain_GT05(5,1)=round(100*length(100*intersect(pitch20, find(constellation=='GPS' & rxAntennaGain_5_L >=0.5)))/length(intersect(pitch20, find(constellation=='GPS'))),1) ;
+rxGain_GT05(5,3)=round(100*length(100*intersect(pitch00, find(constellation=='GPS' & rxAntennaGain_5_L >=0.5)))/length(intersect(pitch00, find(constellation=='GPS'))),1) ;
+rxGain_GT05(5,4)=round(100*length(100*intersect(pitch40, find(constellation=='GPS' & rxAntennaGain_5_L >=0.5)))/length(intersect(pitch40, find(constellation=='GPS'))),1) ;
+rxGain_GT05(5,2)=round(100*length(100*intersect(tc1msec, find(constellation=='GPS' & rxAntennaGain_5_L >=0.5)))/length(intersect(tc1msec, find(constellation=='GPS'))),1) ;
+rxGain_GT05(5,5)=round(100*length(100*intersect(linesp, find(constellation=='GPS' & rxAntennaGain_5_L >=0.5)))/length(intersect(linesp, find(constellation=='GPS'))),1) ;
+rxGain_GT05(5,6)=round(100*length(100*intersect(fixgain, find(constellation=='GPS' & rxAntennaGain_5_L >=0.5)))/length(intersect(fixgain, find(constellation=='GPS'))),1) ;
+rxGain_GT05(5,7)=round(100*length(100*intersect(offsets, find(constellation=='GPS' & rxAntennaGain_5_L >=0.5)))/length(intersect(offsets, find(constellation=='GPS'))),1) ;
+
+rxGain_GT05(6,1)=round(100*length(100*intersect(pitch20, find(constellation=='GPS' & rxAntennaGain_5_R >=0.5)))/length(intersect(pitch20, find(constellation=='GPS'))),1) ;
+rxGain_GT05(6,3)=round(100*length(100*intersect(pitch00, find(constellation=='GPS' & rxAntennaGain_5_R >=0.5)))/length(intersect(pitch00, find(constellation=='GPS'))),1) ;
+rxGain_GT05(6,4)=round(100*length(100*intersect(pitch40, find(constellation=='GPS' & rxAntennaGain_5_R >=0.5)))/length(intersect(pitch40, find(constellation=='GPS'))),1) ;
+rxGain_GT05(6,2)=round(100*length(100*intersect(tc1msec, find(constellation=='GPS' & rxAntennaGain_5_R >=0.5)))/length(intersect(tc1msec, find(constellation=='GPS'))),1) ;
+rxGain_GT05(6,5)=round(100*length(100*intersect(linesp, find(constellation=='GPS' & rxAntennaGain_5_R>=0.5)))/length(intersect(linesp, find(constellation=='GPS'))),1) ;
+rxGain_GT05(6,6)=round(100*length(100*intersect(fixgain, find(constellation=='GPS' & rxAntennaGain_5_R >=0.5)))/length(intersect(fixgain, find(constellation=='GPS'))),1) ;
+rxGain_GT05(6,7)=round(100*length(100*intersect(offsets, find(constellation=='GPS' & rxAntennaGain_5_R >=0.5)))/length(intersect(offsets, find(constellation=='GPS'))),1) ;
+
+rxGain_GT05(7,1)=round(100*length(100*intersect(pitch20, find(constellation=='Galileo' & rxAntennaGain_5_L >=0.5)))/length(intersect(pitch20, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(7,3)=round(100*length(100*intersect(pitch00, find(constellation=='Galileo' & rxAntennaGain_5_L >=0.5)))/length(intersect(pitch00, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(7,4)=round(100*length(100*intersect(pitch40, find(constellation=='Galileo' & rxAntennaGain_5_L >=0.5)))/length(intersect(pitch40, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(7,2)=round(100*length(100*intersect(tc1msec, find(constellation=='Galileo' & rxAntennaGain_5_L >=0.5)))/length(intersect(tc1msec, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(7,5)=round(100*length(100*intersect(linesp, find(constellation=='Galileo' & rxAntennaGain_5_L >=0.5)))/length(intersect(linesp, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(7,6)=round(100*length(100*intersect(fixgain, find(constellation=='Galileo' & rxAntennaGain_5_L >=0.5)))/length(intersect(fixgain, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(7,7)=round(100*length(100*intersect(offsets, find(constellation=='Galileo' & rxAntennaGain_5_L >=0.5)))/length(intersect(offsets, find(constellation=='Galileo'))),1) ;
+
+rxGain_GT05(8,1)=round(100*length(100*intersect(pitch20, find(constellation=='Galileo' & rxAntennaGain_5_R >=0.5)))/length(intersect(pitch20, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(8,3)=round(100*length(100*intersect(pitch00, find(constellation=='Galileo' & rxAntennaGain_5_R >=0.5)))/length(intersect(pitch00, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(8,4)=round(100*length(100*intersect(pitch40, find(constellation=='Galileo' & rxAntennaGain_5_R >=0.5)))/length(intersect(pitch40, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(8,2)=round(100*length(100*intersect(tc1msec, find(constellation=='Galileo' & rxAntennaGain_5_R >=0.5)))/length(intersect(tc1msec, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(8,5)=round(100*length(100*intersect(linesp, find(constellation=='Galileo' & rxAntennaGain_5_R >=0.5)))/length(intersect(linesp, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(8,6)=round(100*length(100*intersect(fixgain, find(constellation=='Galileo' & rxAntennaGain_5_R >=0.5)))/length(intersect(fixgain, find(constellation=='Galileo'))),1) ;
+rxGain_GT05(8,7)=round(100*length(100*intersect(offsets, find(constellation=='Galileo' & rxAntennaGain_5_R >=0.5)))/length(intersect(offsets, find(constellation=='Galileo'))),1) ;
+
+Channel={'L1 Left';'L1 Right';'E1 Left';'E1 Right';'L5 Left';'L5 Right';'E5 Left';'E5 Right'; 'Meand across channels'};
+tutti=round(mean(rxGain_GT05, 1),1) ;
+Mode_Nominal=rxGain_GT05(:,1) ; Mode_Nominal=[Mode_Nominal; tutti(1)] ; 
+Mode_ONEmsec=rxGain_GT05(:,2) ; Mode_ONEmsec=[Mode_ONEmsec; tutti(2)] ;
+Mode_Pitch0=rxGain_GT05(:,3) ; Mode_Pitch0=[Mode_Pitch0; tutti(3)] ;
+Mode_Pitch40=rxGain_GT05(:,4) ; Mode_Pitch40=[Mode_Pitch40; tutti(4)] ;
+Mode_linespac=rxGain_GT05(:,5) ; Mode_linespac=[Mode_linespac; tutti(5)] ;
+Mode_fixgain=rxGain_GT05(:,6) ; Mode_fixgain=[Mode_fixgain; tutti(6)] ;
+Mode_offsets=rxGain_GT05(:,7) ; Mode_offsets=[Mode_offsets; tutti(7)] ;
+TrxGain = table(Channel,Mode_Nominal,Mode_ONEmsec,Mode_Pitch0,Mode_Pitch40,Mode_linespac,Mode_fixgain,Mode_offsets )
+
+%%% FIND NaN 
+NoDataValues(1,1)=round(100*length(find(isnan(reflectivityLinear_1_L)>0 & constellation=='GPS'))/length(reflectivityLinear_1_L(constellation=='GPS')),1) ;
+NoDataValues(1,2)=round(100*length(find(isnan(reflectivityLinear_1_R)>0 & constellation=='GPS'))/length(reflectivityLinear_1_R(constellation=='GPS')),1) ;
+NoDataValues(1,3)=round(100*length(find(isnan(reflectivityLinear_1_L)>0 & constellation=='Galileo'))/length(reflectivityLinear_1_L(constellation=='Galileo')),1) ;
+NoDataValues(1,4)=round(100*length(find(isnan(reflectivityLinear_1_R)>0 & constellation=='Galileo'))/length(reflectivityLinear_1_R(constellation=='Galileo')),1) ;
+NoDataValues(1,5)=round(100*length(find(isnan(reflectivityLinear_5_L)>0 & constellation=='GPS'))/length(reflectivityLinear_5_L(constellation=='GPS')),1) ;
+NoDataValues(1,6)=round(100*length(find(isnan(reflectivityLinear_5_R)>0 & constellation=='GPS'))/length(reflectivityLinear_5_R(constellation=='GPS')),1) ;
+NoDataValues(1,7)=round(100*length(find(isnan(reflectivityLinear_5_L)>0 & constellation=='Galileo'))/length(reflectivityLinear_5_L(constellation=='Galileo')),1) ;
+NoDataValues(1,8)=round(100*length(find(isnan(reflectivityLinear_5_R)>0 & constellation=='Galileo'))/length(reflectivityLinear_5_R(constellation=='Galileo')),1) ;
+
+NoDataValues(2,1)=round(100*length(find(isnan(SNR_1_L)>0 & constellation=='GPS'))/length(SNR_1_L(constellation=='GPS')),1) ;
+NoDataValues(2,2)=round(100*length(find(isnan(SNR_1_R)>0 & constellation=='GPS'))/length(SNR_1_R(constellation=='GPS')),1) ;
+NoDataValues(2,3)=round(100*length(find(isnan(SNR_1_L)>0 & constellation=='Galileo'))/length(SNR_1_L(constellation=='Galileo')),1) ;
+NoDataValues(2,4)=round(100*length(find(isnan(SNR_1_R)>0 & constellation=='Galileo'))/length(SNR_1_R(constellation=='Galileo')),1) ;
+NoDataValues(2,5)=round(100*length(find(isnan(SNR_5_L)>0 & constellation=='GPS'))/length(SNR_5_L(constellation=='GPS')),1) ;
+NoDataValues(2,6)=round(100*length(find(isnan(SNR_5_R)>0 & constellation=='GPS'))/length(SNR_5_R(constellation=='GPS')),1) ;
+NoDataValues(2,7)=round(100*length(find(isnan(SNR_5_L)>0 & constellation=='Galileo'))/length(SNR_5_L(constellation=='Galileo')),1) ;
+NoDataValues(2,8)=round(100*length(find(isnan(SNR_5_R)>0 & constellation=='Galileo'))/length(SNR_5_R(constellation=='Galileo')),1) ;
+
+
+NoDataValues(3,1)=round(100*length(find(isnan(rxAntennaGain_1_L)>0 & constellation=='GPS'))/length(rxAntennaGain_1_L(constellation=='GPS')),1) ;
+NoDataValues(3,2)=round(100*length(find(isnan(rxAntennaGain_1_R)>0 & constellation=='GPS'))/length(rxAntennaGain_1_R(constellation=='GPS')),1) ;
+NoDataValues(3,3)=round(100*length(find(isnan(rxAntennaGain_1_L)>0 & constellation=='Galileo'))/length(rxAntennaGain_1_L(constellation=='Galileo')),1) ;
+NoDataValues(3,4)=round(100*length(find(isnan(rxAntennaGain_1_R)>0 & constellation=='Galileo'))/length(rxAntennaGain_1_R(constellation=='Galileo')),1) ;
+NoDataValues(3,5)=round(100*length(find(isnan(rxAntennaGain_5_L)>0 & constellation=='GPS'))/length(rxAntennaGain_5_L(constellation=='GPS')),1) ;
+NoDataValues(3,6)=round(100*length(find(isnan(rxAntennaGain_5_R)>0 & constellation=='GPS'))/length(rxAntennaGain_5_R(constellation=='GPS')),1) ;
+NoDataValues(3,7)=round(100*length(find(isnan(rxAntennaGain_5_L)>0 & constellation=='Galileo'))/length(rxAntennaGain_5_L(constellation=='Galileo')),1) ;
+NoDataValues(3,8)=round(100*length(find(isnan(rxAntennaGain_5_R)>0 & constellation=='Galileo'))/length(rxAntennaGain_5_R(constellation=='Galileo')),1) ;
+
+Channel={'L1 Left';'L1 Right';'E1 Left';'E1 Right';'L5 Left';'L5 Right';'E5 Left';'E5 Right'; 'Mean across channels'};
+tutti=round(mean(NoDataValues, 2),1) ;
+MissingReflectivity=NoDataValues(1,:)' ; MissingReflectivity=[MissingReflectivity; tutti(1)] ; 
+MissingSNR=NoDataValues(2,:)' ; MissingSNR=[MissingSNR; tutti(2)] ; 
+MissingAntennaGain=NoDataValues(3,:)' ; MissingAntennaGain=[MissingAntennaGain; tutti(2)] ;
+TrxGain = table(Channel,MissingReflectivity, MissingSNR, MissingAntennaGain ) ;
+TrxGain.Properties.Description = 'Missing percentage of three variables'; 
+disp(T.Properties.Description) ; disp(TrxGain) 
+%%%%%%%%%%%%%%%%%%%
+
+NoDataValuesMod(1,1)=round(100*length(intersect(pitch20,find(isnan(reflectivityLinear_1_L)>0 & constellation=='GPS')))/length(reflectivityLinear_1_L(intersect(pitch20, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(1,2)=round(100*length(intersect(pitch00,find(isnan(reflectivityLinear_1_L)>0 & constellation=='GPS')))/length(reflectivityLinear_1_L(intersect(pitch00, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(1,3)=round(100*length(intersect(pitch40,find(isnan(reflectivityLinear_1_L)>0 & constellation=='GPS')))/length(reflectivityLinear_1_L(intersect(pitch40, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(1,4)=round(100*length(intersect(tc1msec,find(isnan(reflectivityLinear_1_L)>0 & constellation=='GPS')))/length(reflectivityLinear_1_L(intersect(tc1msec, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(1,5)=round(100*length(intersect(linesp,find(isnan(reflectivityLinear_1_L)>0 & constellation=='GPS')))/length(reflectivityLinear_1_L(intersect(linesp, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(1,6)=round(100*length(intersect(fixgain,find(isnan(reflectivityLinear_1_L)>0 & constellation=='GPS')))/length(reflectivityLinear_1_L(intersect(fixgain, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(1,7)=round(100*length(intersect(offsets,find(isnan(reflectivityLinear_1_L)>0 & constellation=='GPS')))/length(reflectivityLinear_1_L(intersect(offsets, find(constellation=='GPS')))),1) ;
+
+NoDataValuesMod(3,1)=round(100*length(intersect(pitch20,find(isnan(reflectivityLinear_1_L)>0 & constellation=='Galileo')))/length(reflectivityLinear_1_L(intersect(pitch20, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(3,2)=round(100*length(intersect(pitch00,find(isnan(reflectivityLinear_1_L)>0 & constellation=='Galileo')))/length(reflectivityLinear_1_L(intersect(pitch00, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(3,3)=round(100*length(intersect(pitch40,find(isnan(reflectivityLinear_1_L)>0 & constellation=='Galileo')))/length(reflectivityLinear_1_L(intersect(pitch40, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(3,4)=round(100*length(intersect(tc1msec,find(isnan(reflectivityLinear_1_L)>0 & constellation=='Galileo')))/length(reflectivityLinear_1_L(intersect(tc1msec, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(3,5)=round(100*length(intersect(linesp,find(isnan(reflectivityLinear_1_L)>0 & constellation=='Galileo')))/length(reflectivityLinear_1_L(intersect(linesp, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(3,6)=round(100*length(intersect(fixgain,find(isnan(reflectivityLinear_1_L)>0 & constellation=='Galileo')))/length(reflectivityLinear_1_L(intersect(fixgain, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(3,7)=round(100*length(intersect(offsets,find(isnan(reflectivityLinear_1_L)>0 & constellation=='Galileo')))/length(reflectivityLinear_1_L(intersect(offsets, find(constellation=='Galileo')))),1) ;
+
+NoDataValuesMod(2,1)=round(100*length(intersect(pitch20,find(isnan(reflectivityLinear_1_R)>0 & constellation=='GPS')))/length(reflectivityLinear_1_R(intersect(pitch20, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(2,2)=round(100*length(intersect(pitch00,find(isnan(reflectivityLinear_1_R)>0 & constellation=='GPS')))/length(reflectivityLinear_1_R(intersect(pitch00, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(2,3)=round(100*length(intersect(pitch40,find(isnan(reflectivityLinear_1_R)>0 & constellation=='GPS')))/length(reflectivityLinear_1_R(intersect(pitch40, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(2,4)=round(100*length(intersect(tc1msec,find(isnan(reflectivityLinear_1_R)>0 & constellation=='GPS')))/length(reflectivityLinear_1_R(intersect(tc1msec, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(2,5)=round(100*length(intersect(linesp,find(isnan(reflectivityLinear_1_R)>0 & constellation=='GPS')))/length(reflectivityLinear_1_R(intersect(linesp, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(2,6)=round(100*length(intersect(fixgain,find(isnan(reflectivityLinear_1_R)>0 & constellation=='GPS')))/length(reflectivityLinear_1_R(intersect(fixgain, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(2,7)=round(100*length(intersect(offsets,find(isnan(reflectivityLinear_1_R)>0 & constellation=='GPS')))/length(reflectivityLinear_1_R(intersect(offsets, find(constellation=='GPS')))),1) ;
+
+NoDataValuesMod(4,1)=round(100*length(intersect(pitch20,find(isnan(reflectivityLinear_1_R)>0 & constellation=='Galileo')))/length(reflectivityLinear_1_R(intersect(pitch20, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(4,2)=round(100*length(intersect(pitch00,find(isnan(reflectivityLinear_1_R)>0 & constellation=='Galileo')))/length(reflectivityLinear_1_R(intersect(pitch00, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(4,3)=round(100*length(intersect(pitch40,find(isnan(reflectivityLinear_1_R)>0 & constellation=='Galileo')))/length(reflectivityLinear_1_R(intersect(pitch40, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(4,4)=round(100*length(intersect(tc1msec,find(isnan(reflectivityLinear_1_R)>0 & constellation=='Galileo')))/length(reflectivityLinear_1_R(intersect(tc1msec, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(4,5)=round(100*length(intersect(linesp,find(isnan(reflectivityLinear_1_R)>0 & constellation=='Galileo')))/length(reflectivityLinear_1_R(intersect(linesp, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(4,6)=round(100*length(intersect(fixgain,find(isnan(reflectivityLinear_1_R)>0 & constellation=='Galileo')))/length(reflectivityLinear_1_R(intersect(fixgain, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(4,7)=round(100*length(intersect(offsets,find(isnan(reflectivityLinear_1_R)>0 & constellation=='Galileo')))/length(reflectivityLinear_1_R(intersect(offsets, find(constellation=='Galileo')))),1) ;
+%
+NoDataValuesMod(5,1)=round(100*length(intersect(pitch20,find(isnan(reflectivityLinear_5_L)>0 & constellation=='GPS')))/length(reflectivityLinear_5_L(intersect(pitch20, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(5,2)=round(100*length(intersect(pitch00,find(isnan(reflectivityLinear_5_L)>0 & constellation=='GPS')))/length(reflectivityLinear_5_L(intersect(pitch00, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(5,3)=round(100*length(intersect(pitch40,find(isnan(reflectivityLinear_5_L)>0 & constellation=='GPS')))/length(reflectivityLinear_5_L(intersect(pitch40, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(5,4)=round(100*length(intersect(tc1msec,find(isnan(reflectivityLinear_5_L)>0 & constellation=='GPS')))/length(reflectivityLinear_5_L(intersect(tc1msec, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(5,5)=round(100*length(intersect(linesp,find(isnan(reflectivityLinear_5_L)>0 & constellation=='GPS')))/length(reflectivityLinear_5_L(intersect(linesp, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(5,6)=round(100*length(intersect(fixgain,find(isnan(reflectivityLinear_5_L)>0 & constellation=='GPS')))/length(reflectivityLinear_5_L(intersect(fixgain, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(5,7)=round(100*length(intersect(offsets,find(isnan(reflectivityLinear_5_L)>0 & constellation=='GPS')))/length(reflectivityLinear_5_L(intersect(offsets, find(constellation=='GPS')))),1) ;
+
+NoDataValuesMod(7,1)=round(100*length(intersect(pitch20,find(isnan(reflectivityLinear_5_L)>0 & constellation=='Galileo')))/length(reflectivityLinear_5_L(intersect(pitch20, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(7,2)=round(100*length(intersect(pitch00,find(isnan(reflectivityLinear_5_L)>0 & constellation=='Galileo')))/length(reflectivityLinear_5_L(intersect(pitch00, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(7,3)=round(100*length(intersect(pitch40,find(isnan(reflectivityLinear_5_L)>0 & constellation=='Galileo')))/length(reflectivityLinear_5_L(intersect(pitch40, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(7,4)=round(100*length(intersect(tc1msec,find(isnan(reflectivityLinear_5_L)>0 & constellation=='Galileo')))/length(reflectivityLinear_5_L(intersect(tc1msec, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(7,5)=round(100*length(intersect(linesp,find(isnan(reflectivityLinear_5_L)>0 & constellation=='Galileo')))/length(reflectivityLinear_5_L(intersect(linesp, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(7,6)=round(100*length(intersect(fixgain,find(isnan(reflectivityLinear_5_L)>0 & constellation=='Galileo')))/length(reflectivityLinear_5_L(intersect(fixgain, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(7,7)=round(100*length(intersect(offsets,find(isnan(reflectivityLinear_5_L)>0 & constellation=='Galileo')))/length(reflectivityLinear_5_L(intersect(offsets, find(constellation=='Galileo')))),1) ;
+
+NoDataValuesMod(6,1)=round(100*length(intersect(pitch20,find(isnan(reflectivityLinear_5_R)>0 & constellation=='GPS')))/length(reflectivityLinear_5_R(intersect(pitch20, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(6,2)=round(100*length(intersect(pitch00,find(isnan(reflectivityLinear_5_R)>0 & constellation=='GPS')))/length(reflectivityLinear_5_R(intersect(pitch00, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(6,3)=round(100*length(intersect(pitch40,find(isnan(reflectivityLinear_5_R)>0 & constellation=='GPS')))/length(reflectivityLinear_5_R(intersect(pitch40, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(6,4)=round(100*length(intersect(tc1msec,find(isnan(reflectivityLinear_5_R)>0 & constellation=='GPS')))/length(reflectivityLinear_5_R(intersect(tc1msec, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(6,5)=round(100*length(intersect(linesp,find(isnan(reflectivityLinear_5_R)>0 & constellation=='GPS')))/length(reflectivityLinear_5_R(intersect(linesp, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(6,6)=round(100*length(intersect(fixgain,find(isnan(reflectivityLinear_5_R)>0 & constellation=='GPS')))/length(reflectivityLinear_5_R(intersect(fixgain, find(constellation=='GPS')))),1) ;
+NoDataValuesMod(6,7)=round(100*length(intersect(offsets,find(isnan(reflectivityLinear_5_R)>0 & constellation=='GPS')))/length(reflectivityLinear_5_R(intersect(offsets, find(constellation=='GPS')))),1) ;
+
+NoDataValuesMod(8,1)=round(100*length(intersect(pitch20,find(isnan(reflectivityLinear_5_R)>0 & constellation=='Galileo')))/length(reflectivityLinear_5_R(intersect(pitch20, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(8,2)=round(100*length(intersect(pitch00,find(isnan(reflectivityLinear_5_R)>0 & constellation=='Galileo')))/length(reflectivityLinear_5_R(intersect(pitch00, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(8,3)=round(100*length(intersect(pitch40,find(isnan(reflectivityLinear_5_R)>0 & constellation=='Galileo')))/length(reflectivityLinear_5_R(intersect(pitch40, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(8,4)=round(100*length(intersect(tc1msec,find(isnan(reflectivityLinear_5_R)>0 & constellation=='Galileo')))/length(reflectivityLinear_5_R(intersect(tc1msec, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(8,5)=round(100*length(intersect(linesp,find(isnan(reflectivityLinear_5_R)>0 & constellation=='Galileo')))/length(reflectivityLinear_5_R(intersect(linesp, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(8,6)=round(100*length(intersect(fixgain,find(isnan(reflectivityLinear_5_R)>0 & constellation=='Galileo')))/length(reflectivityLinear_5_R(intersect(fixgain, find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(8,7)=round(100*length(intersect(offsets,find(isnan(reflectivityLinear_5_R)>0 & constellation=='Galileo')))/length(reflectivityLinear_5_R(intersect(offsets, find(constellation=='Galileo')))),1) ;
+
+Channel={'L1 Left';'L1 Right';'E1 Left';'E1 Right';'L5 Left';'L5 Right';'E5 Left';'E5 Right'; 'Mean across channels'};
+tutti=round(mean(NoDataValuesMod, 1),1) ;
+Mode_Nominal=NoDataValuesMod(:,1) ; Mode_Nominal=[Mode_Nominal; tutti(1)] ; 
+Mode_ONEmsec=NoDataValuesMod(:,2) ; Mode_ONEmsec=[Mode_ONEmsec; tutti(2)] ;
+Mode_Pitch0=NoDataValuesMod(:,3) ; Mode_Pitch0=[Mode_Pitch0; tutti(3)] ;
+Mode_Pitch40=NoDataValuesMod(:,4) ; Mode_Pitch40=[Mode_Pitch40; tutti(4)] ;
+Mode_linespac=NoDataValuesMod(:,5) ; Mode_linespac=[Mode_linespac; tutti(5)] ;
+Mode_fixgain=NoDataValuesMod(:,6) ; Mode_fixgain=[Mode_fixgain; tutti(6)] ;
+Mode_offsets=NoDataValuesMod(:,7) ; Mode_offsets=[Mode_offsets; tutti(7)] ;
+TrxGain = table(Channel,Mode_Nominal,Mode_ONEmsec,Mode_Pitch0,Mode_Pitch40,Mode_linespac,Mode_fixgain,Mode_offsets )
+
+
+
 
 end
