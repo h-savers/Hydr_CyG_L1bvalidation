@@ -776,7 +776,7 @@ MissingSNR=NoDataValues(2,:)' ; MissingSNR=[MissingSNR; tutti(2)] ;
 MissingAntennaGain=NoDataValues(3,:)' ; MissingAntennaGain=[MissingAntennaGain; tutti(2)] ;
 TrxGain = table(Channel,MissingReflectivity, MissingSNR, MissingAntennaGain ) ;
 TrxGain.Properties.Description = 'Missing percentage of three variables'; 
-disp(T.Properties.Description) ; disp(TrxGain) 
+disp(TrxGain.Properties.Description) ; disp(TrxGain) ;
 %%%%%%%%%%%%%%%%%%%
 
 NoDataValuesMod(1,1)=round(100*length(intersect(pitch20,find(isnan(reflectivityLinear_1_L)>0 & constellation=='GPS')))/length(reflectivityLinear_1_L(intersect(pitch20, find(constellation=='GPS')))),1) ;
@@ -852,7 +852,9 @@ Mode_Pitch40=NoDataValuesMod(:,4) ; Mode_Pitch40=[Mode_Pitch40; tutti(4)] ;
 Mode_linespac=NoDataValuesMod(:,5) ; Mode_linespac=[Mode_linespac; tutti(5)] ;
 Mode_fixgain=NoDataValuesMod(:,6) ; Mode_fixgain=[Mode_fixgain; tutti(6)] ;
 Mode_offsets=NoDataValuesMod(:,7) ; Mode_offsets=[Mode_offsets; tutti(7)] ;
-TrxGain = table(Channel,Mode_Nominal,Mode_ONEmsec,Mode_Pitch0,Mode_Pitch40,Mode_linespac,Mode_fixgain,Mode_offsets )
+TmissingMode = table(Channel,Mode_Nominal,Mode_ONEmsec,Mode_Pitch0,Mode_Pitch40,Mode_linespac,Mode_fixgain,Mode_offsets )
+TmissingMode.Properties.Description = '    Missing percentage of Channel for different modes'; 
+disp(TmissingMode.Properties.Description) ; disp(TrxGain) ;
 
 
 
