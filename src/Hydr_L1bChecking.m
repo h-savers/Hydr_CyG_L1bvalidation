@@ -220,7 +220,7 @@ title('Over land L5 and E5 Left comparison')
 xlabel('Reflectivity [dB]')
 P11=length(find(isnan(H_reflectivityLinear_5_L(intersect(in, find(H_constellation=='GPS'))))>0)); 
 P11=round(100*P11/length(H_reflectivityLinear_5_L(intersect(in, find(H_constellation=='GPS')))),1) ; 
-P12=length(find(isnan(H_reflectivityLinear_5_L(intersect(in, find(H_constellation=='Galileo'))))>0))
+P12=length(find(isnan(H_reflectivityLinear_5_L(intersect(in, find(H_constellation=='Galileo'))))>0)) ;
 P12=round(100*P12/length(H_reflectivityLinear_5_L(intersect(in, find(H_constellation=='Galileo')))),1) ;
 str11 = {['Missed ' char(string(P11)) '% GPS SP''s'],...
          ['Missed ' char(string(P12)) '% Galileo SP''s']} ;
@@ -235,13 +235,74 @@ title('Over land L5 and E5 Right comparison')
 xlabel('Reflectivity [dB]')
 P11=length(find(isnan(H_reflectivityLinear_5_R(intersect(in, find(H_constellation=='GPS'))))>0)); 
 P11=round(100*P11/length(H_reflectivityLinear_5_R(intersect(in, find(H_constellation=='GPS')))),1) ; 
-P12=length(find(isnan(H_reflectivityLinear_5_R(intersect(in, find(H_constellation=='Galileo'))))>0))
+P12=length(find(isnan(H_reflectivityLinear_5_R(intersect(in, find(H_constellation=='Galileo'))))>0)) ;
 P12=round(100*P12/length(H_reflectivityLinear_5_R(intersect(in, find(H_constellation=='Galileo')))),1) ;
 str11 = {['Missed ' char(string(P11)) '% GPS SP''s'],...
          ['Missed ' char(string(P12)) '% Galileo SP''s']} ;
 text(-20,5000,str11,'FontSize',8)
+%% comparison GPS Galile SNR
+figure
+tt2=tiledlayout(2,2) ; 
+nexttile
+histogram((H_SNR_1_L(intersect(in, find(H_constellation=='GPS')))),100)
+hold on, histogram((H_SNR_1_L(intersect(in, find(H_constellation=='Galileo')))),100)
+xlim([-15,25])
+legend('L1 Left', 'E1 Left')
+title('Over land L1 and E1 Left SNR comparison')
+xlabel('SNR [dB]')
+P11=length(find(isnan(H_SNR_1_L(intersect(in, find(H_constellation=='GPS'))))>0));
+P11=round(100*P11/length(H_SNR_1_L(intersect(in, find(H_constellation=='GPS')))),1) ; 
+P12=length(find(isnan(H_SNR_1_L(intersect(in, find(H_constellation=='Galileo'))))>0)) ;
+P12=round(100*P12/length(H_SNR_1_L(intersect(in, find(H_constellation=='Galileo')))),1) ;
+str11 = {['Missed ' char(string(P11)) '% GPS SP''s'],...
+         ['Missed ' char(string(P12)) '% Galileo SP''s']} ;
+text(5,6000,str11,'FontSize',8)
 
+nexttile
+histogram((H_SNR_1_R(intersect(in, find(H_constellation=='GPS')))),100)
+hold on, histogram((H_SNR_1_R(intersect(in, find(H_constellation=='Galileo')))),100)
+xlim([-15,25])
+legend('L1 Right', 'E1 Right')
+title('Over land L1 and E1 Right SNR comparison')
+xlabel('SNR [dB]')
+P11=length(find(isnan(H_SNR_1_R(intersect(in, find(H_constellation=='GPS'))))>0)); 
+P11=round(100*P11/length(H_SNR_1_R(intersect(in, find(H_constellation=='GPS')))),1) ; 
+P12=length(find(isnan(H_SNR_1_R(intersect(in, find(H_constellation=='Galileo'))))>0)) ;
+P12=round(100*P12/length(H_SNR_1_R(intersect(in, find(H_constellation=='Galileo')))),1) ;
+str11 = {['Missed ' char(string(P11)) '% GPS SP''s'],...
+         ['Missed ' char(string(P12)) '% Galileo SP''s']} ;
+text(5,6000,str11,'FontSize',8)
 
+nexttile
+histogram((H_SNR_5_L(intersect(in, find(H_constellation=='GPS')))),100)
+hold on, histogram((H_SNR_5_L(intersect(in, find(H_constellation=='Galileo')))),100)
+xlim([-15,25])
+legend('L5 Left', 'E5 Left')
+title('Over land L5 and E5 Left SNR comparison')
+xlabel('SNR [dB]')
+P11=length(find(isnan(H_SNR_5_L(intersect(in, find(H_constellation=='GPS'))))>0)); 
+P11=round(100*P11/length(H_SNR_5_L(intersect(in, find(H_constellation=='GPS')))),1) ; 
+P12=length(find(isnan(H_SNR_5_L(intersect(in, find(H_constellation=='Galileo'))))>0))
+P12=round(100*P12/length(H_SNR_5_L(intersect(in, find(H_constellation=='Galileo')))),1) ;
+str11 = {['Missed ' char(string(P11)) '% GPS SP''s'],...
+         ['Missed ' char(string(P12)) '% Galileo SP''s']} ;
+text(5,6000,str11,'FontSize',8)
+
+nexttile
+histogram((H_SNR_5_R(intersect(in, find(H_constellation=='GPS')))), 100)
+hold on, histogram((H_SNR_5_R(intersect(in, find(H_constellation=='Galileo')))), 100)
+xlim([-15,25])
+legend('L5 Right', 'E5 Right')
+title('Over land L5 and E5 Right SNR comparison')
+xlabel('SNR [dB]')
+P11=length(find(isnan(H_SNR_5_R(intersect(in, find(H_constellation=='GPS'))))>0)); 
+P11=round(100*P11/length(H_SNR_5_R(intersect(in, find(H_constellation=='GPS')))),1) ; 
+P12=length(find(isnan(H_SNR_5_R(intersect(in, find(H_constellation=='Galileo'))))>0)) ;
+P12=round(100*P12/length(H_SNR_5_R(intersect(in, find(H_constellation=='Galileo')))),1) ;
+str11 = {['Missed ' char(string(P11)) '% GPS SP''s'],...
+         ['Missed ' char(string(P12)) '% Galileo SP''s']} ;
+text(5,6000,str11,'FontSize',8)
+%%
 figure
 ttt=tiledlayout(2,2) ; 
 nexttile
