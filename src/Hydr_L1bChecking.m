@@ -588,7 +588,41 @@ title('SNR L5/E5 Left with different pitch angle')
 xlabel('SNR L5/E5 [dB]')
 legend('pitch -40 deg', 'pitch 0 deg', 'pitch -20 deg')
 
+% comparing coherent integration and AGC
 
+figure, histogram(rxAntennaGain_1_L(pitch20),100, 'Normalization', 'pdf')
+xlim([-10 15])
+hold on, histogram(rxAntennaGain_1_L(tc1msec),100,'Normalization', 'pdf')
+hold on, histogram(rxAntennaGain_1_L(fixgain),100,'Normalization', 'pdf')
+title('Antenna gain L1/E1 Left with different coherent integration and AGC')
+xlabel('rxAntennaGain L1/E1 [dB]')
+legend('Nominal', 'Tc=1msec', 'fixed gain')
+
+figure, histogram(SNR_1_L(pitch20),100, 'Normalization', 'pdf')
+xlim([-15 20])
+hold on, histogram(SNR_1_L(tc1msec),100,'Normalization', 'pdf')
+hold on, histogram(SNR_1_L(fixgain),100,'Normalization', 'pdf')
+title('SNR L1/E1 Left with different coherent integration and AGC')
+xlabel('SNR L1/E1 [dB]')
+legend('Nominal', 'Tc=1msec', 'fixed gain')
+
+figure, histogram(rxAntennaGain_5_L(pitch20),100, 'Normalization', 'pdf')
+xlim([-10 15])
+hold on, histogram(rxAntennaGain_5_L(tc1msec),100,'Normalization', 'pdf')
+hold on, histogram(rxAntennaGain_5_L(fixgain),100,'Normalization', 'pdf')
+title('Antenna gain L5/E5 Left with different coherent integration and AGC')
+xlabel('rxAntennaGain L5/E5 [dB]')
+legend('Nominal', 'Tc=1msec', 'fixed gain')
+
+figure, histogram(SNR_5_L(pitch20),100, 'Normalization', 'pdf')
+xlim([-15 20])
+hold on, histogram(SNR_5_L(tc1msec),100,'Normalization', 'pdf')
+hold on, histogram(SNR_5_L(fixgain),100,'Normalization', 'pdf')
+title('SNR L5/E5 Left with different coherent integration and AGC')
+xlabel('SNR L5/E5 [dB]')
+legend('Nominal', 'Tc=1msec', 'fixed gain')
+
+%%% STATISTICS
 SNR_GT05(1,1)=round(100*length(100*intersect(pitch20, find(constellation=='GPS' & SNR_1_L >=0.5)))/length(intersect(pitch20, find(constellation=='GPS' & isnan(SNR_1_L)==0))),1) ;
 SNR_GT05(1,3)=round(100*length(100*intersect(pitch00, find(constellation=='GPS' & SNR_1_L >=0.5)))/length(intersect(pitch00, find(constellation=='GPS' & isnan(SNR_1_L)==0))),1) ;
 SNR_GT05(1,4)=round(100*length(100*intersect(pitch40, find(constellation=='GPS' & SNR_1_L >=0.5)))/length(intersect(pitch40, find(constellation=='GPS' & isnan(SNR_1_L)==0))),1) ;
@@ -848,6 +882,15 @@ NoDataValuesMod(8,5)=round(100*length(intersect(linesp,find(isnan(reflectivityLi
 NoDataValuesMod(8,6)=round(100*length(intersect(fixgain,find(isnan(reflectivityLinear_5_R)>0 & constellation=='Galileo')))/length(reflectivityLinear_5_R(intersect(fixgain, find(constellation=='Galileo')))),1) ;
 NoDataValuesMod(8,7)=round(100*length(intersect(offsets,find(isnan(reflectivityLinear_5_R)>0 & constellation=='Galileo')))/length(reflectivityLinear_5_R(intersect(offsets, find(constellation=='Galileo')))),1) ;
 
+NoDataValuesMod(1,8)=round(100*length((find(isnan(reflectivityLinear_1_L)>0 & constellation=='GPS')))/length(reflectivityLinear_1_L((find(constellation=='GPS')))),1) ;
+NoDataValuesMod(2,8)=round(100*length((find(isnan(reflectivityLinear_1_R)>0 & constellation=='GPS')))/length(reflectivityLinear_1_R((find(constellation=='GPS')))),1) ;
+NoDataValuesMod(3,8)=round(100*length((find(isnan(reflectivityLinear_1_L)>0 & constellation=='Galileo')))/length(reflectivityLinear_1_L((find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(4,8)=round(100*length((find(isnan(reflectivityLinear_1_R)>0 & constellation=='Galileo')))/length(reflectivityLinear_1_R((find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(5,8)=round(100*length((find(isnan(reflectivityLinear_5_L)>0 & constellation=='GPS')))/length(reflectivityLinear_5_L((find(constellation=='GPS')))),1) ;
+NoDataValuesMod(6,8)=round(100*length((find(isnan(reflectivityLinear_5_R)>0 & constellation=='GPS')))/length(reflectivityLinear_5_R((find(constellation=='GPS')))),1) ;
+NoDataValuesMod(7,8)=round(100*length((find(isnan(reflectivityLinear_5_L)>0 & constellation=='Galileo')))/length(reflectivityLinear_5_L((find(constellation=='Galileo')))),1) ;
+NoDataValuesMod(8,8)=round(100*length((find(isnan(reflectivityLinear_5_R)>0 & constellation=='Galileo')))/length(reflectivityLinear_5_R((find(constellation=='Galileo')))),1) ;
+
 Channel={'L1 Left';'L1 Right';'E1 Left';'E1 Right';'L5 Left';'L5 Right';'E5 Left';'E5 Right'; 'Mean channels'};
 tutti=round(mean(NoDataValuesMod, 1),1) ;
 Nominal=NoDataValuesMod(:,1) ; Nominal=[Nominal; tutti(1)] ; 
@@ -857,7 +900,8 @@ Pitch40=NoDataValuesMod(:,4) ; Pitch40=[Pitch40; tutti(4)] ;
 Linespacing=NoDataValuesMod(:,5) ; Linespacing=[Linespacing; tutti(5)] ;
 Fixedgain=NoDataValuesMod(:,6) ; Fixedgain=[Fixedgain; tutti(6)] ;
 Offsets=NoDataValuesMod(:,7) ; Offsets=[Offsets; tutti(7)] ;
-TmissingMode = table(Channel,Nominal,ONEmsec,Pitch0,Pitch40,Linespacing,Fixedgain,Offsets ) ;
+AllModes=NoDataValuesMod(:,8) ; AllModes=[AllModes; tutti(8)] ;
+TmissingMode = table(Channel,Nominal,ONEmsec,Pitch0,Pitch40,Linespacing,Fixedgain,Offsets,AllModes ) ;
 TmissingMode.Properties.Description = '      Percentage of missed channels for different modes'; 
 disp(TmissingMode.Properties.Description) ; disp(TmissingMode) ;
 
