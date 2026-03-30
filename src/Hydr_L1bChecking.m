@@ -20,7 +20,8 @@ end
 % H_file='D:\home on Dell NP (gordiani)\HydroGNSS_PhCDE\HydroGNSSCalVal\HydroGNSS_Extract\output\Extract10feb_26-02-15_51-43.mat' ;
 % C_file='D:\home on Dell NP (gordiani)\HydroGNSS_PhCDE\HydroGNSSCalVal\CyGNSS_Extraction\output\MyBrench_20260127-20260130_2026-02-04_21-57-45.mat' ;
 
-[H_file, C_file, ThresholdTimeDelay, ThresholDist, SNRThr, colocMode] = ReadConfFile(configurationPath);
+[H_file, C_file, ThresholdTimeDelay, ThresholDist, SNRThr, colocMode,reflectivityCAL]...
+    = ReadConfFile(configurationPath);
 
 switch mode
     case "GUI" 
@@ -35,21 +36,22 @@ Answer{3}= char(string(ThresholdTimeDelay)) ;
 Answer{4}= char(string(ThresholDist)) ;
 Answer{5}= char(string(SNRThr))  ;
 Answer{6}= char(colocMode) ; 
-
+Answer{7}= char(reflectivityCAL) ; 
 % ****** get inputs from GUI
 prompt={ 'HydroGNSS extracted file : ',...
          'CyGNSS extracted file: ',...
          'Maximum observations time delay [hours]: ',...
          'Maximum distance [meters]: ', ...
          'SNR threshold for reflectivity comparison [dB]: ',...
-         'Colocation Mode [fast | accurate]: '}  ; 
+         'Colocation Mode [fast | accurate]: ',...
+         'Reflectivity version [best|CM1|CM2|CM3|geobounded]: '}  ; 
 opts.Resize='on';
 opts.WindowStyle='normal';
 opts.Interpreter='tex';
 name='HydroGNSS vs CyGNSS L1B data comparison';
-numlines=[1 150; 1 150; 1 90; 1 90; 1 90; 1 90] ; 
+numlines=[1 150; 1 150; 1 90; 1 90; 1 90; 1 90; 1 90] ; 
 defaultanswer={Answer{1},Answer{2},...
-                 Answer{3},Answer{4},Answer{5},Answer{6} };
+                 Answer{3},Answer{4},Answer{5},Answer{6},Answer{7} };
 Answer=inputdlg(prompt,name,numlines,defaultanswer,opts);
 
 H_file= Answer{1};
@@ -57,18 +59,21 @@ C_file= Answer{2};
 ThresholdTimeDelay= str2num(Answer{3});
 ThresholDist= str2num(Answer{4});
 SNRThr=str2num(Answer{5});
-colocMode=Answer{6} ; 
+colocMode=Answer{6} ;
+reflectivityCAL=Answer{7} ;
 %
 % ****** Save GUI input into Input Configuration File 
 % save('../conf/Configuration.mat', 'Answer', '-append') ;
 
-WriteConfig(configurationPath, H_file, C_file, ThresholdTimeDelay, ThresholDist, SNRThr, colocMode);
+WriteConfig(configurationPath, H_file, C_file, ThresholdTimeDelay, ThresholDist,...
+    SNRThr, colocMode,reflectivityCAL);
 
 % switch mode
     case "input" 
     disp('input mode')
 
-[H_file, C_file, ThresholdTimeDelay, ThresholDist, SNRThr, colocMode] = ReadConfFile(configurationPath);
+[H_file, C_file, ThresholdTimeDelay, ThresholDist, SNRThr, colocMode,reflectivityCAL]...
+    = ReadConfFile(configurationPath);
 
 end
 %
@@ -904,8 +909,5 @@ AllModes=NoDataValuesMod(:,8) ; AllModes=[AllModes; tutti(8)] ;
 TmissingMode = table(Channel,Nominal,ONEmsec,Pitch0,Pitch40,Linespacing,Fixedgain,Offsets,AllModes ) ;
 TmissingMode.Properties.Description = '      Percentage of missed channels for different modes'; 
 disp(TmissingMode.Properties.Description) ; disp(TmissingMode) ;
-
-a=1
-
 
 end

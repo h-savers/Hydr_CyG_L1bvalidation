@@ -1,4 +1,5 @@
-function [H_file, C_file, ThresholdTimeDelay, ThresholDist, SNRThr, colocMode] = ReadConfFile(configurationPath)
+function [H_file, C_file, ThresholdTimeDelay, ThresholDist, SNRThr, colocMode,reflectivityCAL]...
+    = ReadConfFile(configurationPath)
 %%%%%%%  Read configuration file
 %
             lines = string(splitlines(fileread(configurationPath)));
@@ -36,4 +37,9 @@ function [H_file, C_file, ThresholdTimeDelay, ThresholDist, SNRThr, colocMode] =
             ConfigRightLine= find(ConfigRightLine==1)  ;   
             startIndex= regexp(lines(ConfigRightLine),'=') ; 
             colocMode= extractAfter(lines(ConfigRightLine),startIndex) ; 
+            %%                  
+            ConfigRightLine= contains(lines,'reflectivityCAL')  ;  
+            ConfigRightLine= find(ConfigRightLine==1)  ;   
+            startIndex= regexp(lines(ConfigRightLine),'=') ; 
+            reflectivityCAL= extractAfter(lines(ConfigRightLine),startIndex) ; 
 end

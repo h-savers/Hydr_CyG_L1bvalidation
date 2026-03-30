@@ -20,7 +20,8 @@ end
 % H_file='D:\home on Dell NP (gordiani)\HydroGNSS_PhCDE\HydroGNSSCalVal\HydroGNSS_Extract\output\Extract10feb_26-02-15_11-33.mat' ;
 % C_file='D:\home on Dell NP (gordiani)\HydroGNSS_PhCDE\HydroGNSSCalVal\CyGNSS_Extraction\output\MyBrench_20260127-20260130_2026-02-04_21-57-45.mat' ;
 
-[H_file, C_file, ThresholdTimeDelay, ThresholDist, SNRThr, colocMode] = ReadConfFile(configurationPath);
+[H_file, C_file, ThresholdTimeDelay, ThresholDist, SNRThr, colocMode,reflectivityCAL]...
+    = ReadConfFile(configurationPath);
 
 switch mode
     case "GUI" 
@@ -35,21 +36,22 @@ Answer{3}= char(string(ThresholdTimeDelay)) ;
 Answer{4}= char(string(ThresholDist)) ;
 Answer{5}= char(string(SNRThr))  ;
 Answer{6}= char(colocMode) ; 
-
+Answer{7}= char(reflectivityCAL) ; 
 % ****** get inputs from GUI
 prompt={ 'HydroGNSS extracted file : ',...
          'CyGNSS extracted file: ',...
          'Maximum observations time delay [hours]: ',...
          'Maximum distance [meters]: ', ...
          'SNR threshold for reflectivity comparison [dB]: ',...
-         'Colocation Mode [fast | accurate]: '}  ; 
+         'Colocation Mode [fast | accurate]: ',...
+         'Reflectivity version [best|CM1|CM2|CM3|geobounded]: '}  ; 
 opts.Resize='on';
 opts.WindowStyle='normal';
 opts.Interpreter='tex';
 name='HydroGNSS vs CyGNSS L1B data comparison';
-numlines=[1 150; 1 150; 1 90; 1 90; 1 90; 1 90] ; 
+numlines=[1 150; 1 150; 1 90; 1 90; 1 90; 1 90; 1 90] ; 
 defaultanswer={Answer{1},Answer{2},...
-                 Answer{3},Answer{4},Answer{5},Answer{6} };
+                 Answer{3},Answer{4},Answer{5},Answer{6},Answer{7} };
 Answer=inputdlg(prompt,name,numlines,defaultanswer,opts);
 
 H_file= Answer{1};
@@ -57,18 +59,21 @@ C_file= Answer{2};
 ThresholdTimeDelay= str2num(Answer{3});
 ThresholDist= str2num(Answer{4});
 SNRThr=str2num(Answer{5});
-colocMode=Answer{6} ; 
+colocMode=Answer{6} ;
+reflectivityCAL=Answer{7} ;
 %
 % ****** Save GUI input into Input Configuration File 
 % save('../conf/Configuration.mat', 'Answer', '-append') ;
 
-WriteConfig(configurationPath, H_file, C_file, ThresholdTimeDelay, ThresholDist, SNRThr, colocMode);
+WriteConfig(configurationPath, H_file, C_file, ThresholdTimeDelay, ThresholDist,...
+    SNRThr, colocMode,reflectivityCAL);
 
 % switch mode
     case "input" 
     disp('input mode')
 
-[H_file, C_file, ThresholdTimeDelay, ThresholDist, SNRThr, colocMode] = ReadConfFile(configurationPath);
+[H_file, C_file, ThresholdTimeDelay, ThresholDist, SNRThr, colocMode,reflectivityCAL]...
+    = ReadConfFile(configurationPath);
 
 end
 %
@@ -77,8 +82,25 @@ end
 load(H_file)
 H_specularPointLat=specularPointLat ;
 H_specularPointLon=specularPointLon ;
+
+switch reflectivityCAL
+    case 'best'
 H_reflectivityLinear_1_L=reflectivityLinear_1_L ;
 H_reflectivityLinear_1_R=reflectivityLinear_1_R ; 
+    case 'CM1'
+H_reflectivityLinear_1_L=10.^(ReflectionCoefficientAtSP_CM1_1_L/10) ;
+H_reflectivityLinear_1_R=10.^(ReflectionCoefficientAtSP_CM1_1_R/10) ; 
+    case 'CM2'
+H_reflectivityLinear_1_L=10.^(ReflectionCoefficientAtSP_CM2_1_L/10) ;
+H_reflectivityLinear_1_R=10.^(ReflectionCoefficientAtSP_CM2_1_R/10) ; 
+    case 'CM3'
+H_reflectivityLinear_1_L=10.^(ReflectionCoefficientAtSP_CM3_1_L/10) ;
+H_reflectivityLinear_1_R=10.^(ReflectionCoefficientAtSP_CM3_1_R/10) ; 
+    case 'geobounded'
+H_reflectivityLinear_1_L=10.^(ReflectionCoefficientUnbounded_1_L/10) ;
+H_reflectivityLinear_1_R=10.^(ReflectionCoefficientUnbounded_1_R/10) ; 
+end 
+
 H_SNR_1_L=SNR_1_L ;
 H_SNR_1_R=SNR_1_R ;
 H_time=timeUTC ;  
@@ -172,6 +194,8 @@ xlabel('SNR=(Pr-N)/N [dB]')
 H_SNR_1_L_match=H_SNR_1_L(H_good) ;
 C_SNR_1_L_match=C_SNR_1_L(C_best) ;
 goodSNR=find(H_SNR_1_L_match>SNRThr & C_SNR_1_L_match> SNRThr) ;
+goodSNR=intersect(goodSNR, find(C_reflectivityLinear_1_L(C_best)~=-Inf & C_reflectivityLinear_1_L(C_best)~=Inf) );
+%%%%  understand why there are Inf and -Inf in C reflectivitym
 H_match_dB=10*log10(H_reflectivityLinear_1_L(H_good));
 C_match_dB=10*log10(C_reflectivityLinear_1_L(C_best)) ; 
 figure, scatter(real(C_match_dB), H_match_dB, '.r')
@@ -180,6 +204,12 @@ xlabel('CyGNSS reflectivity [dB]') ; ylabel('HydroGNSS reflectivity [dB]') ;
 xlim([-45 15]); ylim([-45 15]); 
 hold on, scatter(real(C_match_dB(goodSNR)), H_match_dB(goodSNR), 'ob', 'filled')
 legend('All colocations' , ['SNR>' char(string(SNRThr))])
+RMSE=sqrt(mean((real(C_match_dB(goodSNR))- H_match_dB(goodSNR)).^2)) ; 
+corr=corrcoef(real(C_match_dB(goodSNR)), H_match_dB(goodSNR)) ; corr=corr(1,2) ; 
+standDev=std(real(C_match_dB(goodSNR))- H_match_dB(goodSNR)); 
+BIAS=mean(H_match_dB(goodSNR)-real(C_match_dB(goodSNR)) ) ; 
+
+disp(['BIAS=' char(string(round(BIAS,1))) 'dB; RMSE=' char(string(round(RMSE,1))) 'dB; st.dev.=' char(string(round(standDev,2))) 'dB corr=' char(string(round(corr,2)))])
 
     case 'fast'
 
