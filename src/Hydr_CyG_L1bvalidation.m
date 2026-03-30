@@ -249,7 +249,8 @@ xlabel('CyGNSS Reflectivity L1 Left [dB]')
 title(['Comparison HydroGNSS vs CyGNSS Reflectivity [dB]. SNR>' char(string(SNRThr)) 'dB'])
 xlim([-45 15]); ylim([-45 15]); 
 legend('All colocations' , ['SNR>' char(string(SNRThr))])
-
+[a,b]=tls_fit(real(10*log10(C_reflectivityLinear_1_L(Idx(intersect(goodSNR, NearSpaceTime))))), 10*log10(H_reflectivityLinear_1_L(intersect(goodSNR, NearSpaceTime)))) ;
+x=[-40:1:10];  y=a.*x+b ; plot(x,y,'-g') ; 
 end
 
 end
