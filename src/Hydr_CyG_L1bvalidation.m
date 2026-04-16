@@ -100,14 +100,19 @@ H_reflectivityLinear_1_R=10.^(ReflectionCoefficientAtSP_CM3_1_R/10) ;
 H_reflectivityLinear_1_L=10.^(ReflectionCoefficientUnbounded_1_L/10) ;
 H_reflectivityLinear_1_R=10.^(ReflectionCoefficientUnbounded_1_R/10) ; 
 end 
-
+%%????? Case we want to compare NBRCS
+         H_reflectivityLinear_1_L=10.^(NBRCS_1_L/10) ;
+         H_reflectivityLinear_1_R=10.^(NBRCS_1_R/10) ;
+%%?????        
 H_SNR_1_L=SNR_1_L ;
 H_SNR_1_R=SNR_1_R ;
 H_time=timeUTC ;  
 H_constellation=constellation ; 
+H_Landtypesub=Landtypesub ;
 clearvars -except H_specularPointLat H_specularPointLon H_reflectivityLinear_1_L...
     H_reflectivityLinear_1_R  H_SNR_1_L H_SNR_1_R H_time H_file C_file...
-    sizesave ThresholDist ThresholdTimeDelay SNRThr colocMode H_constellation
+    sizesave ThresholDist ThresholdTimeDelay SNRThr colocMode H_constellation...
+    H_Landtypesub
 load(C_file)
 C_specularPointLat=specularPointLat ;
 C_specularPointLon=specularPointLon ;
@@ -118,11 +123,14 @@ SNR_L1_L(find(SNR_L1_L<=0))=NaN ;
 C_SNR_1_L=10*log10(10.^(SNR_L1_L/10)-1) ;
 % C_SNR_1_R=SNR_1_R ;
 C_time=timeUTC ; 
+%%????? Case we want to compare NBRCS
+        C_reflectivityLinear_1_L=10.^(NBRCS_L1_L/10) ; 
+%%?????
 clearvars -except C_specularPointLat C_specularPointLon C_reflectivityLinear_1_L...
     C_reflectivityLinear_1_R  C_SNR_1_L H_SNR_1_R H_time C_time H_specularPointLat...
     H_specularPointLon H_reflectivityLinear_1_L H_reflectivityLinear_1_R  H_SNR_1_L...
     H_SNR_1_R H_timeUTC H_file C_file sizesave ThresholDist ThresholdTimeDelay...
-    SNRThr H_constellation colocMode
+    SNRThr H_constellation colocMode H_Landtypesub 
 % H_time=datetime(H_timeUTC) ; 
 % C_time=datetime(C_timeUTC) ;
 H_geo=[H_specularPointLat, H_specularPointLon] ;
@@ -132,7 +140,8 @@ H_length=length(H_time) ;
 C_length=length(C_time) ; 
 
 load coastlines ;
-in = inpolygon(H_geo(:,2), H_geo(:,1), coastlon, coastlat);
+% in = inpolygon(H_geo(:,2), H_geo(:,1), coastlon, coastlat);
+in=find(H_Landtypesub==210) ;
 figure, geoscatter(H_geo(in,1),H_geo(in,2), 2, 10*log10(H_reflectivityLinear_1_L(in)), 'filled')
 c=colorbar ; 
 caxis([-35, 0])
@@ -204,11 +213,20 @@ xlabel('CyGNSS reflectivity [dB]') ; ylabel('HydroGNSS reflectivity [dB]') ;
 xlim([-45 15]); ylim([-45 15]); 
 hold on, scatter(real(C_match_dB(goodSNR)), H_match_dB(goodSNR), 'ob', 'filled')
 legend('All colocations' , ['SNR>' char(string(SNRThr))])
-RMSE=sqrt(mean((real(C_match_dB(goodSNR))- H_match_dB(goodSNR)).^2)) ; 
-corr=corrcoef(real(C_match_dB(goodSNR)), H_match_dB(goodSNR)) ; corr=corr(1,2) ; 
-standDev=std(real(C_match_dB(goodSNR))- H_match_dB(goodSNR)); 
-BIAS=mean(H_match_dB(goodSNR)-real(C_match_dB(goodSNR)) ) ; 
+x=real(C_match_dB(goodSNR)); y=H_match_dB(goodSNR) ;
+x=x(Idx(intersect(goodSNR, NearSpaceTime))) ; y=y(intersect(goodSNR, NearSpaceTime)) ;
+notInf=find(x~=Inf & y~=Inf & x~=-Inf & y~=-Inf) ; x=x(notInf) ; y=y(notInf) ;
+[a, b] = tls_fit(x, y) ;
+xx=[-45:5:15] ; yy=xx*a+b ; 
+plot(xx,yy,'-g')
+legend('All colocations' , ['SNR>' char(string(SNRThr))], 'TLS fitting')
 
+RMSE=sqrt(mean((x-y).^2)) ; 
+corr=corrcoef(x, y) ; corr=corr(1,2) ; 
+standDev=std(x- y); 
+BIAS=mean(x-real(C_match_dB(goodSNR)) ) ; 
+
+%% 
 disp(['BIAS=' char(string(round(BIAS,1))) 'dB; RMSE=' char(string(round(RMSE,1))) 'dB; st.dev.=' char(string(round(standDev,2))) 'dB corr=' char(string(round(corr,2)))])
 
     case 'fast'
@@ -242,13 +260,31 @@ title('Colocated L1 Left SNR from HydroGNSS and CyGNSS')
 xlabel('SNR=(Pr-N)/N [dB]')
 
 goodSNR=find(H_SNR_1_L>SNRThr & C_SNR_1_L(Idx)>SNRThr); 
-figure, scatter(real(10*log10(C_reflectivityLinear_1_L(Idx(NearSpaceTime)))), 10*log10(H_reflectivityLinear_1_L(NearSpaceTime)), '.r')
-hold on, scatter(real(10*log10(C_reflectivityLinear_1_L(Idx(intersect(goodSNR, NearSpaceTime))))), 10*log10(H_reflectivityLinear_1_L(intersect(goodSNR, NearSpaceTime))), 'ob', 'filled')
+x=real(10*log10(C_reflectivityLinear_1_L)) ;  y=10*log10(H_reflectivityLinear_1_L) ; 
+figure, scatter(x(Idx(NearSpaceTime)), y(NearSpaceTime), '.r')
+hold on, scatter(x(Idx(intersect(goodSNR, NearSpaceTime))), y(intersect(goodSNR, NearSpaceTime)), 'ob', 'filled')
+
+% figure, scatter(real(10*log10(C_reflectivityLinear_1_L(Idx(NearSpaceTime)))), 10*log10(H_reflectivityLinear_1_L(NearSpaceTime)), '.r')
+% hold on, scatter(real(10*log10(C_reflectivityLinear_1_L(Idx(intersect(goodSNR, NearSpaceTime))))), 10*log10(H_reflectivityLinear_1_L(intersect(goodSNR, NearSpaceTime))), 'ob', 'filled')
 ylabel('HydroGNSS Reflectivity L1 Left [dB]')
 xlabel('CyGNSS Reflectivity L1 Left [dB]')
 title(['Comparison HydroGNSS vs CyGNSS Reflectivity [dB]. SNR>' char(string(SNRThr)) 'dB'])
 xlim([-45 15]); ylim([-45 15]); 
-legend('All colocations' , ['SNR>' char(string(SNRThr))])
+x=x(Idx(intersect(goodSNR, NearSpaceTime))) ; y=y(intersect(goodSNR, NearSpaceTime)) ;
+notInf=find(x~=Inf & y~=Inf & x~=-Inf & y~=-Inf) ; x=x(notInf) ; y=y(notInf) ;
+[a, b] = tls_fit(x, y) ;
+xx=[-45:5:15] ; yy=xx*a+b ; 
+plot(xx,yy,'-g')
+legend('All colocations' , ['SNR>' char(string(SNRThr))], 'TLS fitting')
+
+RMSE=sqrt(mean((x-y).^2)) ; 
+corr=corrcoef(x, y) ; corr=corr(1,2) ; 
+standDev=std(x- y); 
+BIAS=mean(x-real(C_match_dB(goodSNR)) ) ; 
+
+%% 
+disp(['BIAS=' char(string(round(BIAS,1))) 'dB; RMSE=' char(string(round(RMSE,1))) 'dB; st.dev.=' char(string(round(standDev,2))) 'dB corr=' char(string(round(corr,2)))])
+
 
 end
 
