@@ -283,8 +283,7 @@ standDev=std(x- y);
 BIAS=mean(x-real(C_match_dB(goodSNR)) ) ; 
 
 %% 
-disp(['BIAS=' char(string(round(BIAS,1))) 'dB; RMSE=' char(string(round(RMSE,1))) 'dB; st.dev.=' char(string(round(standDev,2))) 'dB corr=' char(string(round(corr,2)))])
-
+disp(['BIAS=' char(string(round(BIAS,1))) 'dB; RMSE=' char(string(round(RMSE,1))) 'dB; st.dev.=' char(string(round(standDev,2))) 'dB corr=' char(string(round(corr,2)))]) ;
 
 end
 
