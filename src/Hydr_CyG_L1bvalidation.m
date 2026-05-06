@@ -101,8 +101,8 @@ H_reflectivityLinear_1_L=10.^(ReflectionCoefficientUnbounded_1_L/10) ;
 H_reflectivityLinear_1_R=10.^(ReflectionCoefficientUnbounded_1_R/10) ; 
 end 
 %%????? Case we want to compare NBRCS
-         H_reflectivityLinear_1_L=10.^(NBRCS_1_L/10) ;
-         H_reflectivityLinear_1_R=10.^(NBRCS_1_R/10) ;
+%          H_reflectivityLinear_1_L=10.^(NBRCS_1_L/10) ;
+%          H_reflectivityLinear_1_R=10.^(NBRCS_1_R/10) ;
 %%?????        
 H_SNR_1_L=SNR_1_L ;
 H_SNR_1_R=SNR_1_R ;
