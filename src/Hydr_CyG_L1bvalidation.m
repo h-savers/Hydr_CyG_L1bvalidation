@@ -124,7 +124,7 @@ C_SNR_1_L=10*log10(10.^(SNR_L1_L/10)-1) ;
 % C_SNR_1_R=SNR_1_R ;
 C_time=timeUTC ; 
 %%????? Case we want to compare NBRCS
-        C_reflectivityLinear_1_L=10.^(NBRCS_L1_L/10) ; 
+%        C_reflectivityLinear_1_L=10.^(NBRCS_L1_L/10) ; 
 %%?????
 clearvars -except C_specularPointLat C_specularPointLon C_reflectivityLinear_1_L...
     C_reflectivityLinear_1_R  C_SNR_1_L H_SNR_1_R H_time C_time H_specularPointLat...
@@ -215,11 +215,13 @@ hold on, scatter(real(C_match_dB(goodSNR)), H_match_dB(goodSNR), 'ob', 'filled')
 legend('All colocations' , ['SNR>' char(string(SNRThr))])
 x=real(C_match_dB(goodSNR)); y=H_match_dB(goodSNR) ;
 % x=x(Idx(intersect(goodSNR, NearSpaceTime))) ; y=y(intersect(goodSNR, NearSpaceTime)) ;
-notInf=find(x~=Inf & y~=Inf & x~=-Inf & y~=-Inf) ; x=x(notInf) ; y=y(notInf) ;
+% notInf=find(x~=Inf & y~=Inf & x~=-Inf & y~=-Inf) ; x=x(notInf) ; y=y(notInf) ;
+notInf=find(x~=Inf & y~=Inf & x~=-Inf & y~=-Inf & isnan(y)==0 & isnan(x)==0) ; x=x(notInf) ; y=y(notInf) ;
 [a, b] = tls_fit(x, y) ;
 xx=[-45:5:15] ; yy=xx*a+b ; 
 plot(xx,yy,'-g')
-legend('All colocations' , ['SNR>' char(string(SNRThr))], 'TLS fitting')
+plot([-45 15], [-45 15], '--b')
+legend('All colocations' , ['SNR>' char(string(SNRThr))], 'TLS fitting', 'one-to-one line')
 
 RMSE=sqrt(mean((x-y).^2)) ; 
 corr=corrcoef(x, y) ; corr=corr(1,2) ; 
