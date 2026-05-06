@@ -214,7 +214,7 @@ xlim([-45 15]); ylim([-45 15]);
 hold on, scatter(real(C_match_dB(goodSNR)), H_match_dB(goodSNR), 'ob', 'filled')
 legend('All colocations' , ['SNR>' char(string(SNRThr))])
 x=real(C_match_dB(goodSNR)); y=H_match_dB(goodSNR) ;
-x=x(Idx(intersect(goodSNR, NearSpaceTime))) ; y=y(intersect(goodSNR, NearSpaceTime)) ;
+% x=x(Idx(intersect(goodSNR, NearSpaceTime))) ; y=y(intersect(goodSNR, NearSpaceTime)) ;
 notInf=find(x~=Inf & y~=Inf & x~=-Inf & y~=-Inf) ; x=x(notInf) ; y=y(notInf) ;
 [a, b] = tls_fit(x, y) ;
 xx=[-45:5:15] ; yy=xx*a+b ; 
@@ -224,7 +224,7 @@ legend('All colocations' , ['SNR>' char(string(SNRThr))], 'TLS fitting')
 RMSE=sqrt(mean((x-y).^2)) ; 
 corr=corrcoef(x, y) ; corr=corr(1,2) ; 
 standDev=std(x- y); 
-BIAS=mean(x-real(C_match_dB(goodSNR)) ) ; 
+BIAS=mean(y-x ) ; 
 
 %% 
 disp(['BIAS=' char(string(round(BIAS,1))) 'dB; RMSE=' char(string(round(RMSE,1))) 'dB; st.dev.=' char(string(round(standDev,2))) 'dB corr=' char(string(round(corr,2)))])
@@ -280,7 +280,7 @@ legend('All colocations' , ['SNR>' char(string(SNRThr))], 'TLS fitting')
 RMSE=sqrt(mean((x-y).^2)) ; 
 corr=corrcoef(x, y) ; corr=corr(1,2) ; 
 standDev=std(x- y); 
-BIAS=mean(x-real(C_match_dB(goodSNR)) ) ; 
+BIAS=mean(x- y ) ; 
 
 %% 
 disp(['BIAS=' char(string(round(BIAS,1))) 'dB; RMSE=' char(string(round(RMSE,1))) 'dB; st.dev.=' char(string(round(standDev,2))) 'dB corr=' char(string(round(corr,2)))]) ;
