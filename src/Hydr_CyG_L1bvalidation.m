@@ -219,7 +219,7 @@ x=real(C_match_dB(goodSNR)); y=H_match_dB(goodSNR) ;
 notInf=find(x~=Inf & y~=Inf & x~=-Inf & y~=-Inf & isnan(y)==0 & isnan(x)==0) ; x=x(notInf) ; y=y(notInf) ;
 [a, b] = tls_fit(x, y) ;
 xx=[-45:5:15] ; yy=xx*a+b ; 
-plot(xx,yy,'-g')
+plot(xx,yy,'-g') 
 plot([-45 15], [-45 15], '--b')
 legend('All colocations' , ['SNR>' char(string(SNRThr))], 'TLS fitting', 'one-to-one line')
 
