@@ -214,8 +214,10 @@ xlim([-45 15]); ylim([-45 15]);
 hold on, scatter(real(C_match_dB(goodSNR)), H_match_dB(goodSNR), 'ob', 'filled')
 legend('All colocations' , ['SNR>' char(string(SNRThr))])
 x=real(C_match_dB(goodSNR)); y=H_match_dB(goodSNR) ;
+
 % x=x(Idx(intersect(goodSNR, NearSpaceTime))) ; y=y(intersect(goodSNR, NearSpaceTime)) ;
 % notInf=find(x~=Inf & y~=Inf & x~=-Inf & y~=-Inf) ; x=x(notInf) ; y=y(notInf) ;
+
 notInf=find(x~=Inf & y~=Inf & x~=-Inf & y~=-Inf & isnan(y)==0 & isnan(x)==0) ; x=x(notInf) ; y=y(notInf) ;
 [a, b] = tls_fit(x, y) ;
 xx=[-45:5:15] ; yy=xx*a+b ; 
