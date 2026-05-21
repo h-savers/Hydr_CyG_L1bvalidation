@@ -12,7 +12,8 @@ function [a, b] = tls_fit(x, y)
     % Assicura vettori colonna
     x = x(:);
     y = y(:);
-
+    finiti=find(isfinite(x)==1 & isfinite(y)==1) ;
+    x=x(finiti) ; y=y(finiti) ; 
     % Centro i dati (importante per TLS)
     mx = mean(x);
     my = mean(y);
