@@ -135,8 +135,8 @@ title('HydroGNSS unfiltered Reflectivity L1/E1 Left [dB]')
 figure
 t=tiledlayout(2,2) ; 
 nexttile ; 
-histogram(10*log10(H_reflectivityLinear_1_L(intersect(in, find(H_constellation=='GPS')))))
-hold on, histogram(10*log10(H_reflectivityLinear_1_R(intersect(in, find(H_constellation=='GPS')))))
+histogram(10*log10(H_reflectivityLinear_1_L(intersect(in, find(H_constellation=='GPS')))),'BinWidth', 1)
+hold on, histogram(10*log10(H_reflectivityLinear_1_R(intersect(in, find(H_constellation=='GPS')))),'BinWidth', 1)
 xlim([-50,5])
 legend('Left', 'Right')
 title('Overland unfiltered reflectivity L1')
@@ -148,8 +148,8 @@ str11 = {[char(string(P11)) ' SP''s >40 dB'],...
 text(-15,4000,str11,'FontSize',6)
 
 nexttile
-histogram(10*log10(H_reflectivityLinear_1_L(intersect(in, find(H_constellation=='Galileo')))))
-hold on, histogram(10*log10(H_reflectivityLinear_1_R(intersect(in, find(H_constellation=='Galileo')))))
+histogram(10*log10(H_reflectivityLinear_1_L(intersect(in, find(H_constellation=='Galileo')))),'BinWidth', 1)
+hold on, histogram(10*log10(H_reflectivityLinear_1_R(intersect(in, find(H_constellation=='Galileo')))),'BinWidth', 1)
 xlim([-50,5])
 legend('Left', 'Right')
 title('Overland unfiltered reflectivity E1')
@@ -161,8 +161,8 @@ str11 = {[char(string(P11)) ' SP''s >40 dB'],...
 text(-10,6000,str11,'FontSize',6)
 
 nexttile
-histogram(10*log10(H_reflectivityLinear_5_L(intersect(in, find(H_constellation=='GPS')))))
-hold on, histogram(10*log10(H_reflectivityLinear_5_R(intersect(in, find(H_constellation=='GPS')))))
+histogram(10*log10(H_reflectivityLinear_5_L(intersect(in, find(H_constellation=='GPS')))),'BinWidth', 1)
+hold on, histogram(10*log10(H_reflectivityLinear_5_R(intersect(in, find(H_constellation=='GPS')))),'BinWidth', 1)
 xlim([-50,5])
 legend('Left', 'Right')
 title('Overland unfiltered reflectivity L5')
@@ -174,8 +174,8 @@ str11 = {[char(string(P11)) ' SP''s >40 dB'],...
 text(-15,4000,str11,'FontSize',6)
 
 nexttile
-histogram(10*log10(H_reflectivityLinear_5_L(intersect(in, find(H_constellation=='Galileo')))))
-hold on, histogram(10*log10(H_reflectivityLinear_5_R(intersect(in, find(H_constellation=='Galileo')))))
+histogram(10*log10(H_reflectivityLinear_5_L(intersect(in, find(H_constellation=='Galileo')))),'BinWidth', 1)
+hold on, histogram(10*log10(H_reflectivityLinear_5_R(intersect(in, find(H_constellation=='Galileo')))),'BinWidth', 1)
 xlim([-50,5])
 legend('Left', 'Right')
 title('Overland unfiltered reflectivity E5')
@@ -189,8 +189,8 @@ text(-15,4000,str11,'FontSize',6)
 figure
 tt=tiledlayout(2,2) ; 
 nexttile
-histogram(10*log10(H_reflectivityLinear_1_L(intersect(in, find(H_constellation=='GPS')))))
-hold on, histogram(10*log10(H_reflectivityLinear_1_L(intersect(in, find(H_constellation=='Galileo')))))
+histogram(10*log10(H_reflectivityLinear_1_L(intersect(in, find(H_constellation=='GPS')))),'BinWidth', 1)
+hold on, histogram(10*log10(H_reflectivityLinear_1_L(intersect(in, find(H_constellation=='Galileo')))),'BinWidth', 1)
 xlim([-50,0])
 legend('L1 Left', 'E1 Left')
 title('Over land L1 and E1 Left comparison')
@@ -199,13 +199,13 @@ P11=length(find(isnan(H_reflectivityLinear_1_L(intersect(in, find(H_constellatio
 P11=round(100*P11/length(H_reflectivityLinear_1_L(intersect(in, find(H_constellation=='GPS')))),1) ; 
 P12=length(find(isnan(H_reflectivityLinear_1_L(intersect(in, find(H_constellation=='Galileo'))))>0)) ;
 P12=round(100*P12/length(H_reflectivityLinear_1_L(intersect(in, find(H_constellation=='Galileo')))),1) ;
-str11 = {['Missed ' char(string(P11)) '% GPS SP''s'],...
+str11 = {['Missed ' char(string(P11)) '% GPS SP''s'],...readDDMsinglefile
          ['Missed ' char(string(P12)) '% Galileo SP''s']} ;
 text(-15,5000,str11,'FontSize',8)
 
 nexttile
-histogram(10*log10(H_reflectivityLinear_1_R(intersect(in, find(H_constellation=='GPS')))))
-hold on, histogram(10*log10(H_reflectivityLinear_1_R(intersect(in, find(H_constellation=='Galileo')))))
+histogram(10*log10(H_reflectivityLinear_1_R(intersect(in, find(H_constellation=='GPS')))), 'BinWidth', 1)
+hold on, histogram(10*log10(H_reflectivityLinear_1_R(intersect(in, find(H_constellation=='Galileo')))), 'BinWidth', 1)
 xlim([-50,0])
 legend('L1 Right', 'E1 Right')
 title('Over land L1 and E1 Right  comparison')
@@ -219,8 +219,8 @@ str11 = {['Missed ' char(string(P11)) '% GPS SP''s'],...
 text(-20,5000,str11,'FontSize',8)
 
 nexttile
-histogram(10*log10(H_reflectivityLinear_5_L(intersect(in, find(H_constellation=='GPS')))))
-hold on, histogram(10*log10(H_reflectivityLinear_5_L(intersect(in, find(H_constellation=='Galileo')))))
+histogram(10*log10(H_reflectivityLinear_5_L(intersect(in, find(H_constellation=='GPS'))))', 'BinWidth', 1)
+hold on, histogram(10*log10(H_reflectivityLinear_5_L(intersect(in, find(H_constellation=='Galileo'))))', 'BinWidth', 1)
 xlim([-50,0])
 legend('L5 Left', 'E5 Left')
 title('Over land L5 and E5 Left comparison')
@@ -234,8 +234,8 @@ str11 = {['Missed ' char(string(P11)) '% GPS SP''s'],...
 text(-20,5000,str11,'FontSize',8)
 
 nexttile
-histogram(10*log10(H_reflectivityLinear_5_R(intersect(in, find(H_constellation=='GPS')))))
-hold on, histogram(10*log10(H_reflectivityLinear_5_R(intersect(in, find(H_constellation=='Galileo')))))
+histogram(10*log10(H_reflectivityLinear_5_R(intersect(in, find(H_constellation=='GPS')))), 'BinWidth', 1)
+hold on, histogram(10*log10(H_reflectivityLinear_5_R(intersect(in, find(H_constellation=='Galileo')))), 'BinWidth', 1)
 xlim([-50,0])
 legend('L5 Right', 'E5 Right')
 title('Over land L5 and E5 Right comparison')
@@ -251,8 +251,8 @@ text(-20,5000,str11,'FontSize',8)
 figure
 tt2=tiledlayout(2,2) ; 
 nexttile
-histogram((H_SNR_1_L(intersect(in, find(H_constellation=='GPS')))),100)
-hold on, histogram((H_SNR_1_L(intersect(in, find(H_constellation=='Galileo')))),100)
+histogram((H_SNR_1_L(intersect(in, find(H_constellation=='GPS')))),'BinWidth', 1)
+hold on, histogram((H_SNR_1_L(intersect(in, find(H_constellation=='Galileo')))),'BinWidth', 1)
 xlim([-15,25])
 legend('L1 Left', 'E1 Left')
 title('Over land L1 and E1 Left SNR comparison')
@@ -266,8 +266,8 @@ str11 = {['Missed ' char(string(P11)) '% GPS SP''s'],...
 text(5,6000,str11,'FontSize',8)
 
 nexttile
-histogram((H_SNR_1_R(intersect(in, find(H_constellation=='GPS')))),100)
-hold on, histogram((H_SNR_1_R(intersect(in, find(H_constellation=='Galileo')))),100)
+histogram((H_SNR_1_R(intersect(in, find(H_constellation=='GPS')))),'BinWidth', 1)
+hold on, histogram((H_SNR_1_R(intersect(in, find(H_constellation=='Galileo')))),'BinWidth', 1)
 xlim([-15,25])
 legend('L1 Right', 'E1 Right')
 title('Over land L1 and E1 Right SNR comparison')
@@ -281,8 +281,8 @@ str11 = {['Missed ' char(string(P11)) '% GPS SP''s'],...
 text(5,6000,str11,'FontSize',8)
 
 nexttile
-histogram((H_SNR_5_L(intersect(in, find(H_constellation=='GPS')))),100)
-hold on, histogram((H_SNR_5_L(intersect(in, find(H_constellation=='Galileo')))),100)
+histogram((H_SNR_5_L(intersect(in, find(H_constellation=='GPS')))),'BinWidth', 1)
+hold on, histogram((H_SNR_5_L(intersect(in, find(H_constellation=='Galileo')))),'BinWidth', 1)
 xlim([-15,25])
 legend('L5 Left', 'E5 Left')
 title('Over land L5 and E5 Left SNR comparison')
@@ -296,8 +296,8 @@ str11 = {['Missed ' char(string(P11)) '% GPS SP''s'],...
 text(5,6000,str11,'FontSize',8)
 
 nexttile
-histogram((H_SNR_5_R(intersect(in, find(H_constellation=='GPS')))), 100)
-hold on, histogram((H_SNR_5_R(intersect(in, find(H_constellation=='Galileo')))), 100)
+histogram((H_SNR_5_R(intersect(in, find(H_constellation=='GPS')))), 'BinWidth', 1)
+hold on, histogram((H_SNR_5_R(intersect(in, find(H_constellation=='Galileo')))), 'BinWidth', 1)
 xlim([-15,25])
 legend('L5 Right', 'E5 Right')
 title('Over land L5 and E5 Right SNR comparison')
@@ -313,8 +313,8 @@ text(5,6000,str11,'FontSize',8)
 figure
 ttt=tiledlayout(2,2) ; 
 nexttile
-histogram(H_SNR_1_L(intersect(in, find(H_constellation=='GPS'))))
-hold on, histogram(H_SNR_1_R(intersect(in, find(H_constellation=='GPS'))))
+histogram(H_SNR_1_L(intersect(in, find(H_constellation=='GPS'))), 'BinWidth', 1)
+hold on, histogram(H_SNR_1_R(intersect(in, find(H_constellation=='GPS'))), 'BinWidth', 1)
 xlim([-15,25])
 legend('Left', 'Right')
 title('Over land SNR L1')
@@ -330,8 +330,8 @@ str11 = {['Left : ' char(string(P11)) '% SNR>' char(string(0.5)) 'dB'],...
 text(10,5000,str11,'FontSize',6)
 
 nexttile
-histogram(H_SNR_1_L(intersect(in, find(H_constellation=='Galileo'))))
-hold on, histogram(H_SNR_1_R(intersect(in, find(H_constellation=='Galileo'))))
+histogram(H_SNR_1_L(intersect(in, find(H_constellation=='Galileo'))), 'BinWidth', 1)
+hold on, histogram(H_SNR_1_R(intersect(in, find(H_constellation=='Galileo'))), 'BinWidth', 1)
 xlim([-15,25])
 legend('Left', 'Right')
 title('Over land SNR E1')
@@ -347,8 +347,8 @@ str11 = {['Left: ' char(string(P11)) '% SNR>' char(string(0.5)) 'dB'],...
 text(10,5000,str11,'FontSize',6)
 
 nexttile
-histogram(H_SNR_5_L(intersect(in, find(H_constellation=='GPS'))))
-hold on, histogram(H_SNR_5_R(intersect(in, find(H_constellation=='GPS'))))
+histogram(H_SNR_5_L(intersect(in, find(H_constellation=='GPS'))), 'BinWidth', 1)
+hold on, histogram(H_SNR_5_R(intersect(in, find(H_constellation=='GPS'))), 'BinWidth', 1)
 xlim([-15,25])
 legend('Left', 'Right')
 title('Over land SNR L5')
@@ -364,8 +364,8 @@ str11 = {['Left : ' char(string(P11)) '% SNR>' char(string(0.5)) 'dB'],...
 text(10,5000,str11,'FontSize',6)
 
 nexttile
-histogram(H_SNR_5_L(intersect(in, find(H_constellation=='Galileo'))))
-hold on, histogram(H_SNR_5_R(intersect(in, find(H_constellation=='Galileo'))))
+histogram(H_SNR_5_L(intersect(in, find(H_constellation=='Galileo'))), 'BinWidth', 1)
+hold on, histogram(H_SNR_5_R(intersect(in, find(H_constellation=='Galileo'))), 'BinWidth', 1)
 xlim([-15,25])
 legend('Left', 'Right')
 title('Over land SNR E5')
@@ -478,8 +478,8 @@ legend('GPS L1', 'Galileo E1')
 line([-60, 20], [-60, 20])
 
 nexttile
-histogram(10*log10(reflectivityLinear_1_L(constellation=='GPS'))+rxAntennaGain_1_L(constellation=='GPS'),100)
-hold on, histogram(10*log10(reflectivityLinear_1_L(constellation=='Galileo'))+rxAntennaGain_1_L(constellation=='Galileo')-3,100)
+histogram(10*log10(reflectivityLinear_1_L(constellation=='GPS'))+rxAntennaGain_1_L(constellation=='GPS'),'BinWidth', 1)
+hold on, histogram(10*log10(reflectivityLinear_1_L(constellation=='Galileo'))+rxAntennaGain_1_L(constellation=='Galileo')-3,'BinWidth', 1)
 xlim([-40,10])
 legend('L1 Left', 'E1 Left')
 title('Over land L1 and E1 Left "corrected" comparison')
@@ -491,8 +491,8 @@ str11 = {['GPS linear mean: ' char(string(round(P11,1))) 'dB (SNR>0.5)' ],...
 text(-10,10000,str11,'FontSize',8)
 
 nexttile
-histogram(10*log10(reflectivityLinear_1_R(constellation=='GPS'))+rxAntennaGain_1_R(constellation=='GPS'),100)
-hold on, histogram(10*log10(reflectivityLinear_1_R(constellation=='Galileo'))+rxAntennaGain_1_R(constellation=='Galileo')-3,100)
+histogram(10*log10(reflectivityLinear_1_R(constellation=='GPS'))+rxAntennaGain_1_R(constellation=='GPS'),'BinWidth', 1)
+hold on, histogram(10*log10(reflectivityLinear_1_R(constellation=='Galileo'))+rxAntennaGain_1_R(constellation=='Galileo')-3,'BinWidth', 1)
 xlim([-40,10])
 legend('L1 Right', 'E1 Right')
 title('Over land L1 and E1 Right "corrected" comparison')
@@ -528,8 +528,8 @@ title('GPS L5 and Galileo E5 "corrected" reflectivity Right vs Left')
 line([-60, 20], [-60, 20])
 
 nexttile
-histogram(10*log10(reflectivityLinear_5_L(constellation=='GPS'))+rxAntennaGain_5_L(constellation=='GPS'),100)
-hold on, histogram(10*log10(reflectivityLinear_5_L(constellation=='Galileo'))+rxAntennaGain_5_L(constellation=='Galileo')-3,100)
+histogram(10*log10(reflectivityLinear_5_L(constellation=='GPS'))+rxAntennaGain_5_L(constellation=='GPS'),'BinWidth', 1)
+hold on, histogram(10*log10(reflectivityLinear_5_L(constellation=='Galileo'))+rxAntennaGain_5_L(constellation=='Galileo')-3,'BinWidth', 1)
 xlim([-40,10])
 legend('L1 Left', 'E1 Left')
 title('Over land L5 and E5 Left "corrected" comparison')
@@ -541,8 +541,8 @@ str11 = {['GPS linear mean: ' char(string(round(P11,1))) 'dB (SNR>0.5)' ],...
 text(-20,15000,str11,'FontSize',8)
 
 nexttile
-histogram(10*log10(reflectivityLinear_5_R(constellation=='GPS'))+rxAntennaGain_5_R(constellation=='GPS'),100)
-hold on, histogram(10*log10(reflectivityLinear_5_R(constellation=='Galileo'))+rxAntennaGain_5_R(constellation=='Galileo')-3,100)
+histogram(10*log10(reflectivityLinear_5_R(constellation=='GPS'))+rxAntennaGain_5_R(constellation=='GPS'),'BinWidth', 1)
+hold on, histogram(10*log10(reflectivityLinear_5_R(constellation=='Galileo'))+rxAntennaGain_5_R(constellation=='Galileo')-3,'BinWidth', 1)
 xlim([-40,10])
 legend('L1 Right', 'E1 Right')
 title('Over land L5 and E5 Right "corrected" comparison')
