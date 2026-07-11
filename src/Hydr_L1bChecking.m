@@ -132,6 +132,19 @@ c=colorbar ; c.Label.String = 'L1/E1 Reflectivity  [dB]';
 caxis([-35, 0])
 title('HydroGNSS unfiltered Reflectivity L1/E1 Left [dB]')
 
+figure, geoscatter(H_geo(in,1),H_geo(in,2), 3, SNR_1_L(in), 'filled')
+colormap(turbo); c=colorbar ; c.Label.String = 'L1/E1 SNR  [dB]';
+caxis([-5, 20])
+title('HydroGNSS unfiltered SNR L1/E1 Left [dB]')
+figure, geoscatter(H_geo(in,1),H_geo(in,2), 3, SNR_1_L(in), 'filled')
+colormap(turbo); c=colorbar ; c.Label.String = 'L1/E1 SNR  [dB]';
+caxis([-5, 20])
+title('HydroGNSS SNR L1/E1 Left [dB] overlapped by SNR>0.5')
+in_great05=find(isnan(hour(H_time))==0 & SNR_1_L>=0.5) ;
+hold on, geoscatter(H_geo(in_great05,1),H_geo(in_great05,2), 3, '.r')
+legend('SNR colormap', 'SNR>0.5 dB SPs')
+
+colormap(parula)
 figure
 t=tiledlayout(2,2) ; 
 nexttile ; 
