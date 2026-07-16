@@ -393,6 +393,67 @@ str11 = {['Left: ' char(string(P11)) '% SNR>' char(string(0.5)) 'dB'],...
     ['Right: ' char(string(P22)) '% SNR>' char(string(2)) 'dB']} ;
 text(10,5000,str11,'FontSize',6)
 %""""""""""""""""""
+%%%%%%%%%%%%%%%%%%%  Init compute percentage greater than SNR thresholds
+ThSNR=[-11 -10 -9 -8 -7 -6 -5 -3 -1 -0.5 0 0.5 1 2 3 4 5 8 10] ;
+figure
+title('Percentage of SPs with SNR above a threshold [%]')
+jj=tiledlayout(2,2) ; 
+
+nexttile
+for JJ=1:length(ThSNR), percHigheSNR_1_L(JJ)=round(100*length(find(H_SNR_1_L(in)>ThSNR(JJ)))/length(H_SNR_1_L(in)),1) ; end, 
+plot(ThSNR,percHigheSNR_1_L ,'-')
+title('L1/E1 Left'), ylim([0,100])
+xlabel('SNR threshold [dB]') , ylabel('Percentage>SNRThr [%]')
+nexttile
+for JJ=1:length(ThSNR), percHigheSNR_1_R(JJ)=round(100*length(find(H_SNR_1_R(in)>ThSNR(JJ)))/length(H_SNR_1_R(in)),1) ; end, 
+plot(ThSNR,percHigheSNR_1_R ,'-')
+title('L1/E1 Right'), ylim([0,100])
+xlabel('SNR threshold [dB]') , ylabel('Percentage>SNRThr [%]')
+nexttile
+for JJ=1:length(ThSNR), percHigheSNR_5_L(JJ)=round(100*length(find(H_SNR_5_L(in)>ThSNR(JJ)))/length(H_SNR_5_L(in)),1) ; end, 
+plot(ThSNR,percHigheSNR_5_L ,'-')
+title('L5/E5 Left'), ylim([0,100])
+xlabel('SNR threshold [dB]') , ylabel('Percentage>SNRThr [%]')
+nexttile
+for JJ=1:length(ThSNR), percHigheSNR_5_R(JJ)=round(100*length(find(H_SNR_5_R(in)>ThSNR(JJ)))/length(H_SNR_5_R(in)),1) ; end, 
+plot(ThSNR,percHigheSNR_5_R ,'-')
+title('L5/E5 Right'), ylim([0,100])
+xlabel('SNR threshold [dB]') , ylabel('Percentage>SNRThr [%]')
+
+%%%%%%%%%%%%%%%%%%%  End compute percentage greater than SNR thresholds
+%%%%%%%%%%%%%%%%%%%%%%%%%% Compute L1b coverage
+% in=intersect(in, find(H_SNR_1_L>0.5)) ; 
+[column,row] = easeconv_grid3(H_geo(:,1), H_geo(:,2), 25) ; 
+A=[column, row] ; 
+[C, ia, ic]= unique(A, 'rows');
+
+NumLandCells=189821 ;
+PercentageFilledCells= 100*length(ia)/NumLandCells ;
+Perc= char(string(PercentageFilledCells)) ; 
+yy=figure('Units', 'centimeters', 'Position', [0 0 21 29.7]) ;
+pp=tiledlayout('flow') ; 
+nexttile
+geoscatter(H_geo(:,1), H_geo(:,2),'.')
+title(['HydroGNSS SPs entire period: from ' char(H_time(1)) ' to ' char(H_time(end))])
+nexttile
+scatter(C(:,1), 585-C(:,2), 1) ; xlim([1, 1388]) ; ylim([1, 584]) ; 
+xlabel('EASE GRid 25 km column'), ylabel('EASE Grid 25km row')
+title(['Overland filled EASE Grid 25km cells: ' Perc(1:4) '%'])
+%% applyt SNR filter
+in=intersect(in, find(H_SNR_1_L>ThSNR(12))) ; 
+[column,row] = easeconv_grid3(H_geo(in,1), H_geo(in,2), 25) ; 
+A=[column, row] ; 
+[C, ia, ic]= unique(A, 'rows');
+
+NumLandCells=189821 ;
+PercentageFilledCells= 100*length(ia)/NumLandCells ;
+Perc= char(string(PercentageFilledCells)) ; 
+nexttile
+scatter(C(:,1), 585-C(:,2), 1) ; xlim([1, 1388]) ; ylim([1, 584]) ; 
+xlabel('EASE GRid 25 km column'), ylabel('EASE Grid 25km row')
+title(['Overland filled EASE Grid 25km cells for SNR>' char(string(ThSNR(12))) 'dB: ' Perc(1:4) '%'])
+
+%%%%%%%%%%%%%%%%%%%%%%%%%% Compute L1b coverage
 figure
 tttt=tiledlayout(2,2) ; 
 nexttile
