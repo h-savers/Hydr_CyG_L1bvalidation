@@ -423,7 +423,8 @@ xlabel('SNR threshold [dB]') , ylabel('Percentage>SNRThr [%]')
 %%%%%%%%%%%%%%%%%%%  End compute percentage greater than SNR thresholds
 %%%%%%%%%%%%%%%%%%%%%%%%%% Compute L1b coverage
 % in=intersect(in, find(H_SNR_1_L>0.5)) ; 
-[column,row] = easeconv_grid3(H_geo(:,1), H_geo(:,2), 25) ; 
+ingood=intersect(in, find(isnan(H_reflectivityLinear_1_L)==0) );
+[column,row] = easeconv_grid3(H_geo(ingood,1), H_geo(ingood,2), 25) ; 
 A=[column, row] ; 
 [C, ia, ic]= unique(A, 'rows');
 
@@ -433,15 +434,16 @@ Perc= char(string(PercentageFilledCells)) ;
 yy=figure('Units', 'centimeters', 'Position', [0 0 21 29.7]) ;
 pp=tiledlayout('flow') ; 
 nexttile
-geoscatter(H_geo(:,1), H_geo(:,2),'.')
-title(['HydroGNSS SPs entire period: from ' char(H_time(1)) ' to ' char(H_time(end))])
+geoscatter(H_geo(ingood), H_geo(ingood,2),'.')
+title(['HydroGNSS L1/E1 Left SPs entire period: from ' char(H_time(1)) ' to ' char(H_time(end))])
 nexttile
 scatter(C(:,1), 585-C(:,2), 1) ; xlim([1, 1388]) ; ylim([1, 584]) ; 
 xlabel('EASE GRid 25 km column'), ylabel('EASE Grid 25km row')
 title(['Overland filled EASE Grid 25km cells: ' Perc(1:4) '%'])
 %% applyt SNR filter
-in=intersect(in, find(H_SNR_1_L>ThSNR(12))) ; 
-[column,row] = easeconv_grid3(H_geo(in,1), H_geo(in,2), 25) ; 
+ingood=intersect(ingood, find(H_SNR_1_L>ThSNR(12))) ;
+% in=intersect(in, find(isnan(H_reflectivityLinear_1_L)==0) );
+[column,row] = easeconv_grid3(H_geo(ingood,1), H_geo(ingood,2), 25) ; 
 A=[column, row] ; 
 [C, ia, ic]= unique(A, 'rows');
 
